@@ -34,4 +34,4 @@ lint: ## check the script compiles
 
 .PHONY: test
 test: ## run the tests against a fake installer layout
-	PYTHONDONTWRITEBYTECODE=1 $(PYTHON) -m unittest -v test_extract_mohaa_for_vita
+	PYTHONDONTWRITEBYTECODE=1 $(PYTHON) extract_mohaa_for_vita.test.py -v
