@@ -179,7 +179,7 @@ def main():
         print("\nIMPORTANT: Keep the .exe AND all matching -*.bin files in the same folder!")
         sys.exit(1)
 
-    installer_path = Path(sys.argv[1]).resolve()
+    installer_path = Path(sys.argv[1]).expanduser().resolve()
 
     if not installer_path.exists():
         print(f"Error: Installer not found: {installer_path}", file=sys.stderr)

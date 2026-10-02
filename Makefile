@@ -10,9 +10,11 @@ help: ## show this help
 
 ##@ Extraction
 .PHONY: extract
-extract: ## extract game data: make extract INSTALLER=path/to/setup_medal_of_honor_*.exe
-	@test -n "$(INSTALLER)" || { echo "set INSTALLER=path/to/setup_medal_of_honor_*.exe"; exit 1; }
-	$(PYTHON) extract_mohaa_for_vita.py "$(INSTALLER)"
+# read without -r, so the backslashes a terminal adds to a dragged-in path are undone
+extract: ## extract game data, asks for the installer unless INSTALLER= is given
+	@i="$(INSTALLER)"; [ -n "$$i" ] || { printf 'Path to setup_medal_of_honor_*.exe (drag it here): '; read i; }; \
+	[ -n "$$i" ] || { echo "no installer given" >&2; exit 1; }; \
+	$(PYTHON) extract_mohaa_for_vita.py "$$i"
 
 .PHONY: clean
 clean: ## delete the extracted game data
