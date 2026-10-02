@@ -23,6 +23,8 @@ You need at least one of the following extraction tools installed and available 
 | [`7-Zip`](https://www.7-zip.org/) (`7z`) | Fallback for multi-part installers | **macOS:** `brew install p7zip` • **Linux:** `sudo apt install p7zip-full` • **Windows:** [Download from 7-zip.org](https://www.7-zip.org/) (add to PATH) |
 | [`unzip`](https://linux.die.net/man/1/unzip) | Linux `.sh` installers | Usually pre-installed on most systems |
 
+On macOS and Linux, `make tools` shows which of these are installed, and `make deps` installs innoextract and 7-Zip with `brew` or `apt`.
+
 ## Usage
 
 ### 1. Download your GOG installer files
@@ -44,9 +46,13 @@ Run the script and pass the `.exe` file as the argument. You only need to point 
 
 #### macOS / Linux
 
+From this repository's folder:
+
 ```bash
-python3 extract_mohaa_for_vita.py ~/Downloads/setup_medal_of_honor_2.0.0.21.exe
+make extract
 ```
+
+It asks for the installer; drag the `.exe` into the terminal window and press Enter. To skip the question, pass it directly: `make extract INSTALLER=~/Downloads/setup_medal_of_honor_2.0.0.21.exe`. Run `make` on its own to list the other targets.
 
 #### Windows (Command Prompt/PowerShell)
 
