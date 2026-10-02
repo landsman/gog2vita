@@ -29,20 +29,21 @@ On macOS and Linux, `make tools` shows which of these are installed, and `make d
 
 ### 1. Download your GOG installer files
 
-From your GOG account, download the offline backup installer for *[Medal of Honor: Allied Assault](https://www.gog.com/en/account)*. For recent versions, you'll get files like this (all in the same folder):
+From your GOG account, download the offline backup installer for *[Medal of Honor: Allied Assault](https://www.gog.com/en/account)* and put the files in the `gog/` folder of this repository. For recent versions, that looks like this:
 
 ```text
-setup_medal_of_honor_2.0.0.21.exe
-setup_medal_of_honor_2.0.0.21-1.bin
-setup_medal_of_honor_2.0.0.21-2.bin
+gog/
+├── setup_medal_of_honor_2.0.0.21.exe
+├── setup_medal_of_honor_2.0.0.21-1.bin
+└── setup_medal_of_honor_2.0.0.21-2.bin
 ```
 
 > [!IMPORTANT]
-> Keep the `.exe` and **all** matching `-*.bin` files in the same directory. The script automatically detects them regardless of version number.
+> Keep the `.exe` and **all** matching `-*.bin` files together, and only one installer version in `gog/` at a time. Git ignores everything in `gog/`, so the game files are never committed.
 
 ### 2. Run the script
 
-Run the script and pass the `.exe` file as the argument. You only need to point it at the `.exe` — it will automatically use the `.bin` parts.
+The script only needs the `.exe` and picks up the `.bin` parts next to it.
 
 #### macOS / Linux
 
@@ -52,12 +53,14 @@ From this repository's folder:
 make extract
 ```
 
-It asks for the installer; drag the `.exe` into the terminal window and press Enter. To skip the question, pass it directly: `make extract INSTALLER=~/Downloads/setup_medal_of_honor_2.0.0.21.exe`. Run `make` on its own to list the other targets.
+It finds the installer in `gog/` on its own. If there is none, it asks for one; drag the `.exe` into the terminal window and press Enter. To use an installer somewhere else, pass it directly: `make extract INSTALLER=~/Downloads/setup_medal_of_honor_2.0.0.21.exe`. Run `make` on its own to list the other targets.
 
 #### Windows (Command Prompt/PowerShell)
 
+From this repository's folder:
+
 ```powershell
-python extract_mohaa_for_vita.py "C:\Users\YourUsername\Downloads\setup_medal_of_honor_2.0.0.21.exe"
+python extract_mohaa_for_vita.py gog\setup_medal_of_honor_2.0.0.21.exe
 ```
 
 ### 3. Transfer to your PS Vita

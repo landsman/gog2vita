@@ -1,6 +1,8 @@
 .DEFAULT_GOAL := help
 PYTHON ?= python3
 OUT := OpenMoHAA_Vita_GameData
+# ponytail: takes the first match, put one installer version in gog/ at a time
+INSTALLER ?= $(firstword $(wildcard gog/setup_medal_of_honor*.exe))
 
 .PHONY: help
 help: ## show this help
@@ -11,7 +13,7 @@ help: ## show this help
 ##@ Extraction
 .PHONY: extract
 # read without -r, so the backslashes a terminal adds to a dragged-in path are undone
-extract: ## extract game data, asks for the installer unless INSTALLER= is given
+extract: ## extract game data from gog/, asks for the installer when there is none
 	@i="$(INSTALLER)"; [ -n "$$i" ] || { printf 'Path to setup_medal_of_honor_*.exe (drag it here): '; read i; }; \
 	[ -n "$$i" ] || { echo "no installer given" >&2; exit 1; }; \
 	$(PYTHON) extract_mohaa_for_vita.py "$$i"
