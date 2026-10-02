@@ -1,6 +1,6 @@
 .DEFAULT_GOAL := help
 PYTHON ?= python3
-OUT := OpenMoHAA_Vita_GameData
+OUT := openmohaa
 # ponytail: takes the first match, put one installer version in gog/ at a time
 INSTALLER ?= $(firstword $(wildcard gog/setup_medal_of_honor*.exe))
 

@@ -65,17 +65,17 @@ python extract_mohaa_for_vita.py gog\setup_medal_of_honor_2.0.0.21.exe
 
 ### 3. Transfer to your PS Vita
 
-After extraction completes, you'll find a new folder in the same directory as the script:
+After extraction completes, you'll find a new folder in the same directory as the script, laid out like `ux0:data/openmohaa/` on the Vita:
 
 ```text
-OpenMoHAA_Vita_GameData/main/
+openmohaa/main/
 ```
 
 To transfer to your Vita:
 
 1. Open [VitaShell](https://github.com/TheOfficialFloW/VitaShell) on your PS Vita (via USB or FTP).
 2. Navigate to `ux0:data/openmohaa/` on your Vita. Create the `openmohaa` folder if it doesn't exist.
-3. Drag and drop the `main/` folder from `OpenMoHAA_Vita_GameData/` directly into `ux0:data/openmohaa/`.
+3. Drag and drop the `main/` folder from `openmohaa/` directly into `ux0:data/openmohaa/`.
 4. Launch [OpenMoHAA Vita](https://github.com/ChatProductions/openmohaavita) from your LiveArea.
 
 > [!NOTE]

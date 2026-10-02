@@ -186,7 +186,7 @@ def main():
         sys.exit(1)
 
     script_dir = Path(__file__).parent.resolve()
-    output_parent = script_dir / "OpenMoHAA_Vita_GameData"
+    output_parent = script_dir / "openmohaa"
     output_main_dir = output_parent / "main"
 
     print(f"Extracting GOG installer: {installer_path.name}")
@@ -240,7 +240,7 @@ def main():
         print("1. Open VitaShell on your PS Vita (USB or FTP)")
         print("2. Go to: ux0:data/openmohaa/")
         print("   (Create 'openmohaa' folder if it doesn't exist)")
-        print("3. Drag and drop the 'main' folder from 'OpenMoHAA_Vita_GameData/'")
+        print("3. Drag and drop the 'main' folder from 'openmohaa/'")
         print("   directly into ux0:data/openmohaa/")
         print()
         print("Do NOT copy configs/ or save/ folders. OpenMoHAA Vita generates those automatically.")
