@@ -40,13 +40,11 @@ def extract_exe(installer_path, temp_dir):
             subprocess.run(
                 [innoextract, exe_name, "-d", str(temp_dir)],
                 check=True,
-                capture_output=True,
-                text=True,
                 cwd=exe_dir
             )
             return True
         except subprocess.CalledProcessError as e:
-            err = e.stderr.strip() if e.stderr else e.stdout.strip()
+            err = f"exit code {e.returncode}, see its output above"
             print(f"Warning: innoextract failed: {err}", file=sys.stderr)
 
     # Fallback to 7-Zip (works very well with exe+bin multi-part installers)
@@ -54,15 +52,13 @@ def extract_exe(installer_path, temp_dir):
     if seven_zip:
         try:
             subprocess.run(
-                [seven_zip, "x", exe_name, f"-o{temp_dir}", "-y"],
+                [seven_zip, "x", exe_name, f"-o{temp_dir}", "-y", "-bsp1"],
                 check=True,
-                capture_output=True,
-                text=True,
                 cwd=exe_dir
             )
             return True
         except subprocess.CalledProcessError as e:
-            err = e.stderr.strip() if e.stderr else e.stdout.strip()
+            err = f"exit code {e.returncode}, see its output above"
             print(f"Warning: 7-Zip failed: {err}", file=sys.stderr)
 
     print("Error: Could not extract .exe file.", file=sys.stderr)
@@ -84,8 +80,6 @@ def extract_sh(installer_path, temp_dir):
             subprocess.run(
                 [unzip_tool, "-o", sh_name, "-d", str(temp_dir)],
                 check=True,
-                capture_output=True,
-                text=True,
                 cwd=sh_dir
             )
             return True
@@ -100,13 +94,11 @@ def extract_sh(installer_path, temp_dir):
         subprocess.run(
             [str(installer_path), "--noexec", "--target", str(temp_dir)],
             check=True,
-            capture_output=True,
-            text=True,
             cwd=sh_dir
         )
         return True
     except subprocess.CalledProcessError as e:
-        err = e.stderr.strip() if e.stderr else ""
+        err = f"exit code {e.returncode}, see its output above"
         print(f"Warning: Self-extraction failed: {err}", file=sys.stderr)
 
     # Fallback to 7-Zip
@@ -116,13 +108,11 @@ def extract_sh(installer_path, temp_dir):
             subprocess.run(
                 [seven_zip, "x", sh_name, f"-o{temp_dir}", "-y"],
                 check=True,
-                capture_output=True,
-                text=True,
                 cwd=sh_dir
             )
             return True
         except subprocess.CalledProcessError as e:
-            err = e.stderr.strip() if e.stderr else e.stdout.strip()
+            err = f"exit code {e.returncode}, see its output above"
             print(f"Warning: 7-Zip failed: {err}", file=sys.stderr)
 
     print("Error: Could not extract .sh file.", file=sys.stderr)
@@ -157,7 +147,8 @@ def copy_required_files(source_dir, output_main_dir):
     output_main_dir.mkdir(parents=True)
 
     copied_items = []
-    for item in main_dir.glob("*.pk3"):
+    for item in sorted(main_dir.glob("*.pk3")):
+        print(f"  copying {item.name}", flush=True)
         shutil.copy2(item, output_main_dir / item.name)
         copied_items.append(item.name)
 
@@ -165,6 +156,7 @@ def copy_required_files(source_dir, output_main_dir):
     for dir_name in OPTIONAL_DIRS:
         item = main_dir / dir_name
         if item.is_dir():
+            print(f"  copying {dir_name}/", flush=True)
             shutil.copytree(item, output_main_dir / dir_name)
             copied_items.append(f"{dir_name}/")
 
