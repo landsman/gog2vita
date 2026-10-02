@@ -1,2 +1,5 @@
 /openmohaa/
 __pycache__/
+# GOG installer files, never committed
+/gog/*
+!/gog/.gitkeep
