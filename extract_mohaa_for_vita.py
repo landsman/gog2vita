@@ -128,38 +128,45 @@ def extract_sh(installer_path, temp_dir):
     print("Error: Could not extract .sh file.", file=sys.stderr)
     return False
 
+def find_main_dir(source_dir):
+    """Find the base game's main/ folder, the one holding Pak0.
+
+    The installer also ships the expansions (mainta/, maintt/) with their own
+    pak files, which must not end up in the base game's folder.
+    """
+    for pak in source_dir.rglob("Pak0*.pk3"):
+        if pak.parent.name.lower() == "main":
+            return pak.parent
+    return None
+
 def copy_required_files(source_dir, output_main_dir):
-    """Copy all required and optional OpenMoHAA Vita files."""
+    """Copy all required and optional OpenMoHAA Vita files from the base game's main/."""
+    main_dir = find_main_dir(source_dir)
+    if main_dir is None:
+        return [], [f"{p}*.pk3" for p in REQUIRED_PAKS_PREFIX]
+
+    missing_required = [
+        f"{p}*.pk3" for p in REQUIRED_PAKS_PREFIX if not any(main_dir.glob(f"{p}*.pk3"))
+    ]
+    if missing_required:
+        return [], missing_required
+
+    # Start from an empty folder, so nothing from an earlier run is left behind
+    if output_main_dir.exists():
+        shutil.rmtree(output_main_dir)
+    output_main_dir.mkdir(parents=True)
+
     copied_items = []
-    missing_required = []
-
-    # Copy required PAKs (Pak0 - Pak5)
-    for pak_prefix in REQUIRED_PAKS_PREFIX:
-        found = False
-        for item in source_dir.rglob(f"{pak_prefix}*.pk3"):
-            shutil.copy2(item, output_main_dir / item.name)
-            copied_items.append(item.name)
-            found = True
-            break
-        if not found:
-            missing_required.append(f"{pak_prefix}*.pk3")
-
-    # Copy all other Pak*.pk3 files (optional but recommended)
-    for item in source_dir.rglob("*.pk3"):
-        if item.name not in copied_items:
-            shutil.copy2(item, output_main_dir / item.name)
-            copied_items.append(item.name)
+    for item in main_dir.glob("*.pk3"):
+        shutil.copy2(item, output_main_dir / item.name)
+        copied_items.append(item.name)
 
     # Copy optional directories (preserve structure, case-sensitive safe)
     for dir_name in OPTIONAL_DIRS:
-        for item in source_dir.rglob(dir_name):
-            if item.is_dir():
-                dest_dir = output_main_dir / item.name
-                if dest_dir.exists():
-                    shutil.rmtree(dest_dir)
-                shutil.copytree(item, dest_dir, dirs_exist_ok=False)
-                copied_items.append(f"{dir_name}/")
-                break
+        item = main_dir / dir_name
+        if item.is_dir():
+            shutil.copytree(item, output_main_dir / dir_name)
+            copied_items.append(f"{dir_name}/")
 
     return copied_items, missing_required
 
@@ -181,7 +188,6 @@ def main():
     script_dir = Path(__file__).parent.resolve()
     output_parent = script_dir / "OpenMoHAA_Vita_GameData"
     output_main_dir = output_parent / "main"
-    output_main_dir.mkdir(parents=True, exist_ok=True)
 
     print(f"Extracting GOG installer: {installer_path.name}")
     print(f"Working directory: {installer_path.parent}")
@@ -221,8 +227,10 @@ def main():
             for item in missing:
                 print(f"  - {item}")
             print("\nYour installation may be incomplete. Verify your GOG download is intact.")
-        else:
-            print("\nAll required PAK files (Pak0–Pak5) were found!")
+            print("Nothing was written to the output folder.")
+            sys.exit(1)
+
+        print("\nAll required PAK files (Pak0–Pak5) were found!")
 
         print()
         print("=== READY FOR PS VITA ===")

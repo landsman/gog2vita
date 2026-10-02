@@ -31,3 +31,7 @@ deps: ## install innoextract and 7-Zip with brew or apt
 .PHONY: lint
 lint: ## check the script compiles
 	$(PYTHON) -c "import ast; ast.parse(open('extract_mohaa_for_vita.py').read())"
+
+.PHONY: test
+test: ## run the tests against a fake installer layout
+	PYTHONDONTWRITEBYTECODE=1 $(PYTHON) -m unittest -v test_extract_mohaa_for_vita
