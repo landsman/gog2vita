@@ -6,10 +6,15 @@ import subprocess
 import tempfile
 import platform
 import glob
+import json
+import urllib.request
 from pathlib import Path
 
 REQUIRED_PAKS_PREFIX = ["Pak0", "Pak1", "Pak2", "Pak3", "Pak4", "Pak5"]
 OPTIONAL_DIRS = ["sound", "music", "video"]
+RELEASES_API = "https://api.github.com/repos/ChatProductions/openmohaavita/releases"
+RELEASES_PAGE = "https://github.com/ChatProductions/openmohaavita/releases"
+VPK_NAME = "OpenMoHAA.vpk"
 
 def find_tool(command_names):
     """Find an executable tool from a list of possible command names."""
@@ -162,6 +167,38 @@ def copy_required_files(source_dir, output_main_dir):
 
     return copied_items, missing_required
 
+def newest_vpk(releases):
+    """Tag and URL of the newest release that ships the VPK.
+
+    Pre-releases count: upstream has published nothing else so far, which is
+    also why GitHub's /releases/latest link returns 404 for it.
+    """
+    for release in releases:
+        if release.get("draft"):
+            continue
+        for asset in release.get("assets", []):
+            if asset.get("name") == VPK_NAME:
+                return release["tag_name"], asset["browser_download_url"]
+    return None
+
+def download_vpk(output_parent):
+    """Download the newest OpenMoHAA.vpk next to main/. A failure only warns: the game data is already done."""
+    try:
+        with urllib.request.urlopen(RELEASES_API, timeout=30) as response:
+            found = newest_vpk(json.load(response))
+        if found is None:
+            print(f"Warning: no release ships {VPK_NAME}; get it from {RELEASES_PAGE}", file=sys.stderr)
+            return None
+        tag, url = found
+        print(f"Downloading {VPK_NAME} {tag}...", flush=True)
+        part = output_parent / (VPK_NAME + ".part")
+        urllib.request.urlretrieve(url, part)
+        part.replace(output_parent / VPK_NAME)
+        return tag
+    except (OSError, ValueError) as e:
+        print(f"Warning: could not download {VPK_NAME} ({e}); get it from {RELEASES_PAGE}", file=sys.stderr)
+        return None
+
 def main():
     if len(sys.argv) != 2:
         print("Usage: python3 extract_mohaa_for_vita.py <path_to_gog_installer.exe>")
@@ -223,17 +260,20 @@ def main():
             sys.exit(1)
 
         print("\nAll required PAK files (Pak0–Pak5) were found!")
+        print()
+        vpk_tag = download_vpk(output_parent)
 
         print()
         print("=== READY FOR PS VITA ===")
         print(f"Game data prepared at: {output_parent}")
         print()
         print("Transfer steps:")
-        print("1. Open VitaShell on your PS Vita (USB or FTP)")
-        print("2. Go to: ux0:data/openmohaa/")
-        print("   (Create 'openmohaa' folder if it doesn't exist)")
-        print("3. Drag and drop the 'main' folder from 'openmohaa/'")
-        print("   directly into ux0:data/openmohaa/")
+        if vpk_tag:
+            print(f"1. Install openmohaa/{VPK_NAME} ({vpk_tag}) with VitaShell")
+        else:
+            print(f"1. Install {VPK_NAME} from {RELEASES_PAGE} with VitaShell")
+        print("2. Copy the 'main' folder from 'openmohaa/' so it ends up as")
+        print("   ux0:data/openmohaa/main/ (create ux0:data/openmohaa/ if needed)")
         print()
         print("Do NOT copy configs/ or save/ folders. OpenMoHAA Vita generates those automatically.")
 

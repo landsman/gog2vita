@@ -2,7 +2,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from extract_mohaa_for_vita import copy_required_files
+from extract_mohaa_for_vita import copy_required_files, newest_vpk
 
 
 def touch(path, text=""):
@@ -43,6 +43,21 @@ class CopyRequiredFiles(unittest.TestCase):
         self.assertEqual(missing, ["Pak5*.pk3"])
         self.assertEqual(copied, [])
         self.assertTrue((self.out / "previous.pk3").exists())
+
+
+class NewestVpk(unittest.TestCase):
+    def test_takes_the_newest_release_with_a_vpk_prereleases_included(self):
+        def release(tag, *assets, draft=False):
+            return {"tag_name": tag, "draft": draft, "prerelease": True,
+                    "assets": [{"name": a, "browser_download_url": f"https://x/{tag}/{a}"} for a in assets]}
+
+        releases = [
+            release("v3", "OpenMoHAA.vpk", draft=True),
+            release("v2", "OpenMoHAA-Vita-symbols.zip"),
+            release("v1", "OpenMoHAA.vpk"),
+        ]
+        self.assertEqual(newest_vpk(releases), ("v1", "https://x/v1/OpenMoHAA.vpk"))
+        self.assertIsNone(newest_vpk([]))
 
 
 if __name__ == "__main__":

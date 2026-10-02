@@ -67,14 +67,16 @@ python extract_mohaa_for_vita.py gog\setup_medal_of_honor_2.0.0.21.exe
 
 These steps follow the [OpenMoHAA Vita install guide](https://github.com/ChatProductions/openmohaavita#install). You need a homebrew-capable PS Vita.
 
-After extraction completes, you'll find a new folder in the same directory as the script, laid out like `ux0:data/openmohaa/` on the Vita:
+After extraction completes, you'll find a new folder in the same directory as the script:
 
 ```text
-openmohaa/main/
+openmohaa/
+├── OpenMoHAA.vpk   ← the newest OpenMoHAA Vita release, downloaded on every run
+└── main/           ← the game data, laid out like ux0:data/openmohaa/main/ on the Vita
 ```
 
-1. Download `OpenMoHAA.vpk` from the [latest OpenMoHAA Vita release](https://github.com/ChatProductions/openmohaavita/releases/latest).
-2. Install the VPK with [VitaShell](https://github.com/TheOfficialFloW/VitaShell).
+1. The script downloads `OpenMoHAA.vpk` from the newest [OpenMoHAA Vita release](https://github.com/ChatProductions/openmohaavita/releases), pre-releases included, so a run always brings the current version. If the download fails, it says so and the game data is still complete; get the VPK from that page yourself.
+2. Install `openmohaa/OpenMoHAA.vpk` with [VitaShell](https://github.com/TheOfficialFloW/VitaShell).
 3. In VitaShell, connect over USB or FTP and copy the extracted `openmohaa/main/` folder so it ends up as:
 
    ```text
