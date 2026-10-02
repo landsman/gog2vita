@@ -12,8 +12,8 @@ from pathlib import Path
 
 REQUIRED_PAKS_PREFIX = ["Pak0", "Pak1", "Pak2", "Pak3", "Pak4", "Pak5"]
 OPTIONAL_DIRS = ["sound", "music", "video"]
-RELEASES_API = "https://api.github.com/repos/ChatProductions/openmohaavita/releases"
-RELEASES_PAGE = "https://github.com/ChatProductions/openmohaavita/releases"
+RELEASES_API = "https://api.github.com/repos/HenryKun55/openmohaa/releases"
+RELEASES_PAGE = "https://github.com/HenryKun55/openmohaa/releases"
 VPK_NAME = "OpenMoHAA.vpk"
 
 def find_tool(command_names):
@@ -168,11 +168,7 @@ def copy_required_files(source_dir, output_main_dir):
     return copied_items, missing_required
 
 def newest_vpk(releases):
-    """Tag and URL of the newest release that ships the VPK.
-
-    Pre-releases count: upstream has published nothing else so far, which is
-    also why GitHub's /releases/latest link returns 404 for it.
-    """
+    """Tag and URL of the newest release that ships the VPK, pre-releases included."""
     for release in releases:
         if release.get("draft"):
             continue

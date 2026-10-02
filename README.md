@@ -1,6 +1,6 @@
 # OpenMoHAA Vita GOG Extractor
 
-A cross-platform one-command script to extract game data from your GOG.com copy of *Medal of Honor: Allied Assault* and prepare it for use with [OpenMoHAA Vita](https://github.com/ChatProductions/openmohaavita).
+A cross-platform one-command script to extract game data from your GOG.com copy of *Medal of Honor: Allied Assault* and prepare it for use with [OpenMoHAA for PS Vita](https://github.com/HenryKun55/openmohaa), HenryKun55's Vita port of [OpenMoHAA](https://github.com/openmoh/openmohaa).
 
 This script handles both single-file installers and GOG's multi-part installers (`.exe` + `-*.bin` files), automatically extracts the correct game data, and creates a ready-to-transfer `main/` folder for your PS Vita.
 
@@ -65,17 +65,17 @@ python extract_mohaa_for_vita.py gog\setup_medal_of_honor_2.0.0.21.exe
 
 ### 3. Install OpenMoHAA Vita and copy the game data
 
-These steps follow the [OpenMoHAA Vita install guide](https://github.com/ChatProductions/openmohaavita#install). You need a homebrew-capable PS Vita.
+These steps follow the port's [install guide](https://github.com/HenryKun55/openmohaa/blob/vita-port/docs/PORTING-VITA.md#install-on-the-vita). You need a homebrew-capable PS Vita with `ur0:data/libshacccg.suprx`, the Vita's shader compiler; if it is missing, install and run [ShaRKF00D](https://github.com/Rinnegatamante/ShaRKF00D) once, or the menu shows only white outlines.
 
 After extraction completes, you'll find a new folder in the same directory as the script:
 
 ```text
 openmohaa/
-├── OpenMoHAA.vpk   ← the newest OpenMoHAA Vita release, downloaded on every run
+├── OpenMoHAA.vpk   ← the newest release of the port, downloaded on every run
 └── main/           ← the game data, laid out like ux0:data/openmohaa/main/ on the Vita
 ```
 
-1. The script downloads `OpenMoHAA.vpk` from the newest [OpenMoHAA Vita release](https://github.com/ChatProductions/openmohaavita/releases), pre-releases included, so a run always brings the current version. If the download fails, it says so and the game data is still complete; get the VPK from that page yourself.
+1. The script downloads `OpenMoHAA.vpk` from the newest [release of the port](https://github.com/HenryKun55/openmohaa/releases), so a run always brings the current version; installing it over an older one keeps settings and saves. If the download fails, it says so and the game data is still complete; get the VPK from that page yourself.
 2. Install `openmohaa/OpenMoHAA.vpk` with [VitaShell](https://github.com/TheOfficialFloW/VitaShell).
 3. In VitaShell, connect over USB or FTP and copy the extracted `openmohaa/main/` folder so it ends up as:
 
@@ -87,11 +87,13 @@ openmohaa/
 4. Launch OpenMoHAA from LiveArea.
 
 > [!NOTE]
-> Do **not** copy `configs/` or `save/` folders from a computer installation. OpenMoHAA Vita creates its own on first launch.
+> Do **not** copy `configs/` or `save/` folders from a computer installation. The port creates its own on first launch.
+
+The release also offers optional `lang_*.pk3` packs that translate the menu pictures into Portuguese, Spanish, French, German or Italian. The script does not download them; copy the one you want next to the paks in `ux0:data/openmohaa/main/`.
 
 ## What Gets Extracted
 
-The script collects the files the [OpenMoHAA Vita install guide](https://github.com/ChatProductions/openmohaavita#install) asks for, from the base game's `main/` folder only:
+The script collects the files the port's [install guide](https://github.com/HenryKun55/openmohaa/blob/vita-port/docs/PORTING-VITA.md#install-on-the-vita) asks for, from the base game's `main/` folder only:
 
 | File or folder | Requirement | Notes |
 |---|---|---|
@@ -109,11 +111,12 @@ If the installer also carries the expansions (`mainta/`, `maintt/`), their files
 - **Missing BIN files**: Ensure all `-*.bin` files are in the same folder as the `.exe`. The script will list detected BINs when it runs.
 - **Extraction fails**: Try installing `innoextract` (recommended) or `7-Zip`. The script will tell you which tools it tried and what to install.
 - **Wrong installer**: Make sure you're using the "Offline Backup Game Installers" from GOG, not the Galaxy installer.
-- **Long load times on Vita**: This is a [known limitation](https://github.com/ChatProductions/openmohaavita#long-loading-times) of the OpenMoHAA Vita port and is expected behavior.
+- **Only white outlines in the menu**: `libshacccg.suprx` is missing; run [ShaRKF00D](https://github.com/Rinnegatamante/ShaRKF00D) once.
+- **Something else goes wrong on the Vita**: see the port's [how to report a problem](https://github.com/HenryKun55/openmohaa/issues/2) and attach `ux0:data/openmohaa/main/boot.log`.
 
 ## Credits
 
-This extractor is designed specifically for preparing GOG copies for [OpenMoHAA Vita](https://github.com/ChatProductions/openmohaavita) by [Chat Productions](https://github.com/ChatProductions).
+This extractor prepares GOG copies for [OpenMoHAA for PS Vita](https://github.com/HenryKun55/openmohaa) by [HenryKun55](https://github.com/HenryKun55), built on [OpenMoHAA](https://github.com/openmoh/openmohaa).
 
 ## License
 
