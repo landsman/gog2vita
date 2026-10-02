@@ -63,7 +63,9 @@ From this repository's folder:
 python extract_mohaa_for_vita.py gog\setup_medal_of_honor_2.0.0.21.exe
 ```
 
-### 3. Transfer to your PS Vita
+### 3. Install OpenMoHAA Vita and copy the game data
+
+These steps follow the [OpenMoHAA Vita install guide](https://github.com/ChatProductions/openmohaavita#install). You need a homebrew-capable PS Vita.
 
 After extraction completes, you'll find a new folder in the same directory as the script, laid out like `ux0:data/openmohaa/` on the Vita:
 
@@ -71,27 +73,34 @@ After extraction completes, you'll find a new folder in the same directory as th
 openmohaa/main/
 ```
 
-To transfer to your Vita:
+1. Download `OpenMoHAA.vpk` from the [latest OpenMoHAA Vita release](https://github.com/ChatProductions/openmohaavita/releases/latest).
+2. Install the VPK with [VitaShell](https://github.com/TheOfficialFloW/VitaShell).
+3. In VitaShell, connect over USB or FTP and copy the extracted `openmohaa/main/` folder so it ends up as:
 
-1. Open [VitaShell](https://github.com/TheOfficialFloW/VitaShell) on your PS Vita (via USB or FTP).
-2. Navigate to `ux0:data/openmohaa/` on your Vita. Create the `openmohaa` folder if it doesn't exist.
-3. Drag and drop the `main/` folder from `openmohaa/` directly into `ux0:data/openmohaa/`.
-4. Launch [OpenMoHAA Vita](https://github.com/ChatProductions/openmohaavita) from your LiveArea.
+   ```text
+   ux0:data/openmohaa/main/
+   ```
+
+   Create `ux0:data/openmohaa/` first if it doesn't exist.
+4. Launch OpenMoHAA from LiveArea.
 
 > [!NOTE]
-> Do **not** copy `configs/` or `save/` folders. OpenMoHAA Vita will generate these automatically on first launch.
+> Do **not** copy `configs/` or `save/` folders from a computer installation. OpenMoHAA Vita creates its own on first launch.
 
 ## What Gets Extracted
 
-The script collects everything OpenMoHAA Vita needs:
+The script collects the files the [OpenMoHAA Vita install guide](https://github.com/ChatProductions/openmohaavita#install) asks for, from the base game's `main/` folder only:
 
-| File/Folder | Required | Notes |
+| File or folder | Requirement | Notes |
 |---|---|---|
-| `Pak0.pk3` – `Pak5.pk3` | **Yes** | Base game + official 1.11 update data. |
-| Any other `Pak*.pk3` files | If present | All additional PAK files (e.g. language packs) are included. |
-| `sound/` | If present | Preserves original structure and case. Vita is case-sensitive for these files. |
-| `music/` | If present | Copied if present as loose files. |
-| `video/` | If present | Copied if intro/cinematic files exist outside PAKs. |
+| `Pak0.pk3` – `Pak3.pk3` | Required | Base-game data. |
+| `Pak4.pk3` – `Pak5.pk3` | Required | Data from the official 1.11 update. |
+| Other `Pak*.pk3` files | Copied when present | Language and additional official data such as `Pak6EnUk.pk3` or `pak7.pk3`. |
+| `music/` | Copied when present | Loose background-music files stored outside the paks. |
+| `sound/` | Copied when present | Loose audio, copied with its subfolders and file names as the installer has them. |
+| `video/` | Copied when present | RoQ intro and cinematic files stored outside the paks. |
+
+If the installer also carries the expansions (`mainta/`, `maintt/`), their files are left out.
 
 ## Troubleshooting
 
