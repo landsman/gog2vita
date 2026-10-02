@@ -27,7 +27,7 @@ You need at least one of the following extraction tools installed and available 
 
 ### 1. Download your GOG installer files
 
-From your GOG account, download the offline backup installer for *Medal of Honor: Allied Assault*. For recent versions, you'll get files like this (all in the same folder):
+From your GOG account, download the offline backup installer for *[Medal of Honor: Allied Assault](https://www.gog.com/en/account)*. For recent versions, you'll get files like this (all in the same folder):
 
 ```text
 setup_medal_of_honor_2.0.0.21.exe
