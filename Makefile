@@ -1,8 +1,7 @@
 .DEFAULT_GOAL := help
 PYTHON ?= python3
-OUT := openmohaa
-# ponytail: takes the first match, put one installer version in gog/ at a time
-INSTALLER ?= $(firstword $(wildcard gog/setup_medal_of_honor*.exe))
+SCRIPT := extract_for_vita.py
+INSTALLER ?=
 
 .PHONY: help
 help: ## show this help
@@ -12,15 +11,12 @@ help: ## show this help
 
 ##@ Extraction
 .PHONY: extract
-# read without -r, so the backslashes a terminal adds to a dragged-in path are undone
-extract: ## extract game data from gog/, asks for the installer when there is none
-	@i="$(INSTALLER)"; [ -n "$$i" ] || { printf 'Path to setup_medal_of_honor_*.exe (drag it here): '; read i; }; \
-	[ -n "$$i" ] || { echo "no installer given" >&2; exit 1; }; \
-	$(PYTHON) extract_mohaa_for_vita.py "$$i"
+extract: ## extract game data, asks which installer in gog/ when there are several
+	$(PYTHON) $(SCRIPT) $(if $(INSTALLER),"$(INSTALLER)")
 
 .PHONY: clean
 clean: ## delete the extracted game data
-	rm -rf $(OUT)
+	rm -rf openmohaa devilutionx
 
 ##@ Setup
 .PHONY: tools
@@ -33,9 +29,9 @@ deps: ## install innoextract and 7-Zip with brew or apt
 
 ##@ Quality assurance
 .PHONY: lint
-lint: ## check the script compiles
-	$(PYTHON) -c "import ast; ast.parse(open('extract_mohaa_for_vita.py').read())"
+lint: ## check the scripts compile
+	$(PYTHON) -m py_compile $(SCRIPT) games/*.py
 
 .PHONY: test
 test: ## run the tests against a fake installer layout
-	PYTHONDONTWRITEBYTECODE=1 $(PYTHON) extract_mohaa_for_vita.test.py -v
+	PYTHONDONTWRITEBYTECODE=1 $(PYTHON) extract_for_vita.test.py -v

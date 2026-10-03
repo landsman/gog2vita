@@ -2,7 +2,9 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from extract_mohaa_for_vita import copy_required_files, newest_vpk
+from extract_for_vita import detect_game, newest_vpk
+from games.diablo import collect as collect_diablo
+from games.mohaa import collect as collect_mohaa
 
 
 def touch(path, text=""):
@@ -10,7 +12,7 @@ def touch(path, text=""):
     path.write_text(text)
 
 
-class CopyRequiredFiles(unittest.TestCase):
+class CollectMohaa(unittest.TestCase):
     def setUp(self):
         self.tmp = Path(tempfile.mkdtemp())
         self.src = self.tmp / "extracted"
@@ -24,7 +26,7 @@ class CopyRequiredFiles(unittest.TestCase):
         touch(self.src / "app" / "mainta" / "sound" / "b.wav")
         touch(self.out / "stale.pk3")
 
-        copied, missing = copy_required_files(self.src, self.out)
+        copied, missing = collect_mohaa(self.src, self.out)
 
         self.assertEqual(missing, [])
         self.assertEqual(sorted(p.name for p in self.out.glob("*.pk3")),
@@ -38,11 +40,47 @@ class CopyRequiredFiles(unittest.TestCase):
             touch(self.src / "app" / "main" / f"Pak{n}.pk3")
         touch(self.out / "previous.pk3")
 
-        copied, missing = copy_required_files(self.src, self.out)
+        copied, missing = collect_mohaa(self.src, self.out)
 
         self.assertEqual(missing, ["Pak5*.pk3"])
         self.assertEqual(copied, [])
         self.assertTrue((self.out / "previous.pk3").exists())
+
+
+class CollectDiablo(unittest.TestCase):
+    def setUp(self):
+        self.tmp = Path(tempfile.mkdtemp())
+        self.src = self.tmp / "extracted"
+        self.out = self.tmp / "out" / "devilution"
+
+    def test_copies_diablo_and_hellfire_mpqs_only(self):
+        touch(self.src / "DIABDAT.MPQ")
+        touch(self.src / "Patch_rt.mpq")
+        for name in ["hellfire", "hfmonk", "hfmusic", "hfvoice"]:
+            touch(self.src / "hellfire" / f"{name}.mpq")
+        touch(self.out / "stale.mpq")
+
+        copied, missing = collect_diablo(self.src, self.out)
+
+        self.assertEqual(missing, [])
+        self.assertEqual(sorted(p.name for p in self.out.iterdir()),
+                         ["DIABDAT.MPQ", "hellfire.mpq", "hfmonk.mpq", "hfmusic.mpq", "hfvoice.mpq"])
+
+    def test_missing_diabdat_leaves_the_output_alone(self):
+        touch(self.src / "hellfire" / "hellfire.mpq")
+        touch(self.out / "previous.mpq")
+
+        copied, missing = collect_diablo(self.src, self.out)
+
+        self.assertEqual((copied, missing), ([], ["DIABDAT.MPQ"]))
+        self.assertTrue((self.out / "previous.mpq").exists())
+
+
+class DetectGame(unittest.TestCase):
+    def test_picks_the_profile_by_installer_name(self):
+        self.assertEqual(detect_game("setup_diablo_1.09_hellfire_v4_(78466).exe")["port"], "DevilutionX")
+        self.assertEqual(detect_game("setup_medal_of_honor_2.0.0.21.exe")["port"], "OpenMoHAA")
+        self.assertIsNone(detect_game("setup_quake.exe"))
 
 
 class NewestVpk(unittest.TestCase):
@@ -56,8 +94,8 @@ class NewestVpk(unittest.TestCase):
             release("v2", "OpenMoHAA-Vita-symbols.zip"),
             release("v1", "OpenMoHAA.vpk"),
         ]
-        self.assertEqual(newest_vpk(releases), ("v1", "https://x/v1/OpenMoHAA.vpk"))
-        self.assertIsNone(newest_vpk([]))
+        self.assertEqual(newest_vpk(releases, "OpenMoHAA.vpk"), ("v1", "https://x/v1/OpenMoHAA.vpk"))
+        self.assertIsNone(newest_vpk([], "OpenMoHAA.vpk"))
 
 
 if __name__ == "__main__":
