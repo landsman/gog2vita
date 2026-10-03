@@ -32,7 +32,7 @@ GAME = {
     # signed-in GOG link that starts the offline installer download
     "download": "https://www.gog.com/downloads/diablo/en1installer0",
     "port": "DevilutionX",
-    "out": "devilutionx",
+    "out": "diasurgical",
     "data": "devilution",
     "vita_path": "ux0:data/diasurgical/devilution/",
     "repo": "diasurgical/devilutionX",

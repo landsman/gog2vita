@@ -55,7 +55,7 @@ python extract_for_vita.py
 python extract_for_vita.py "gog\setup_diablo_1.09_hellfire_v4_(78466).exe"
 ```
 
-The game is recognised by the installer's file name; if the name is not one the script knows, it asks which game it is. The output lands in a folder named after the port, in this repository — `openmohaa/` or `devilutionx/` — and the game's guide says where it goes on the Vita.
+The game is recognised by the installer's file name; if the name is not one the script knows, it asks which game it is. The output lands in this repository laid out the way `ux0:data/` expects it — `openmohaa/main/` or `diasurgical/devilution/` — and the game's guide says where it goes on the Vita.
 
 ## Troubleshooting
 

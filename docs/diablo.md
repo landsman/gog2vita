@@ -22,14 +22,14 @@ See [Usage in the README](../README.md#usage).
 These steps follow DevilutionX's [install guide](https://github.com/diasurgical/devilutionX/blob/master/docs/installing.md). After extraction you'll find:
 
 ```text
-devilutionx/
+diasurgical/
 ├── devilutionx-vita.vpk   ← the newest release, downloaded on every run
 └── devilution/            ← the MPQ files for ux0:data/diasurgical/devilution/
 ```
 
 1. The script downloads `devilutionx-vita.vpk` from the newest [DevilutionX release](https://github.com/diasurgical/devilutionX/releases). If the download fails, it says so and the game data is still complete; get the VPK from that page yourself.
-2. Install `devilutionx/devilutionx-vita.vpk` with [VitaShell](https://github.com/TheOfficialFloW/VitaShell).
-3. In VitaShell, connect over USB or FTP and copy the files from `devilutionx/devilution/` into `ux0:data/diasurgical/devilution/`, creating the folder if it doesn't exist.
+2. Install `diasurgical/devilutionx-vita.vpk` with [VitaShell](https://github.com/TheOfficialFloW/VitaShell).
+3. In VitaShell, connect over USB or FTP and copy the `diasurgical/devilution/` folder into `ux0:data/`, so the files end up in `ux0:data/diasurgical/devilution/`.
 4. Launch DevilutionX from LiveArea.
 
 ## What Gets Extracted

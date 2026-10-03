@@ -16,7 +16,7 @@ extract: ## extract game data, asks which installer in gog/ when there are sever
 
 .PHONY: clean
 clean: ## delete the extracted game data
-	rm -rf openmohaa devilutionx
+	rm -rf openmohaa diasurgical
 
 ##@ Setup
 .PHONY: tools
