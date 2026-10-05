@@ -10,6 +10,9 @@ import json
 import urllib.request
 from pathlib import Path
 
+ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT))  # games/ sits at the repo root
+
 from games import GAMES
 
 def find_tool(command_names):
@@ -203,7 +206,7 @@ def pick_installer(gog_dir):
 
 def main():
     if len(sys.argv) > 2 or sys.argv[1:] in (["-h"], ["--help"]):
-        print("Usage: python3 extract_for_vita.py [path_to_gog_installer.exe]")
+        print("Usage: python3 scripts/extract_for_vita.py [path_to_gog_installer.exe]")
         print("\nWithout a path it takes the installer from gog/, asking which one if there are several.")
         print("\nSupported games:")
         for game in GAMES:
@@ -211,11 +214,10 @@ def main():
         print("\nIMPORTANT: Keep the .exe AND all matching -*.bin files in the same folder!")
         sys.exit(1)
 
-    script_dir = Path(__file__).parent.resolve()
     if len(sys.argv) == 2:
         installer_path, game = Path(sys.argv[1]), None
     else:
-        installer_path, game = pick_installer(script_dir / "gog")
+        installer_path, game = pick_installer(ROOT / "gog")
     if installer_path is None:
         print("Error: no installer given", file=sys.stderr)
         sys.exit(1)
@@ -230,7 +232,7 @@ def main():
         print(f"{installer_path.name} is not a name this script knows. Which game is it?")
         game = GAMES[choose("Game", [f"{g['title']} for {g['port']}" for g in GAMES])]
 
-    output_parent = script_dir / game["out"]
+    output_parent = ROOT / game["out"]
     output_data_dir = output_parent / game["data"]
 
     print(f"Extracting GOG installer: {installer_path.name} ({game['title']})")
