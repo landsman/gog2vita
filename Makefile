@@ -1,6 +1,6 @@
 .DEFAULT_GOAL := help
 PYTHON ?= python3
-SCRIPT := extract_for_vita.py
+SCRIPT := scripts/extract_for_vita.py
 INSTALLER ?=
 
 .PHONY: help
@@ -30,8 +30,8 @@ deps: ## install innoextract and 7-Zip with brew or apt
 ##@ Quality assurance
 .PHONY: lint
 lint: ## check the scripts compile
-	$(PYTHON) -m py_compile $(SCRIPT) games/*.py
+	$(PYTHON) -m py_compile scripts/*.py games/*.py
 
 .PHONY: test
 test: ## run the tests against a fake installer layout
-	PYTHONDONTWRITEBYTECODE=1 $(PYTHON) extract_for_vita.test.py -v
+	@for t in scripts/*.test.py; do PYTHONDONTWRITEBYTECODE=1 $(PYTHON) $$t -v || exit 1; done
