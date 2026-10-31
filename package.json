@@ -8,8 +8,10 @@
     "#lib/*": "./src/lib/*.ts"
   },
   "scripts": {
+    "prepare": "git config core.hooksPath .githooks || true",
     "format": "oxfmt --ignore-path=.gitignore .",
-    "lint": "oxfmt --check --ignore-path=.gitignore . && oxlint --deny-warnings src"
+    "format:check": "oxfmt --check --ignore-path=.gitignore .",
+    "lint": "bun run format:check && oxlint --deny-warnings src"
   },
   "dependencies": {
     "ts-pattern": "5.9.2"

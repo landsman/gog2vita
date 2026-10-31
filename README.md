@@ -69,6 +69,10 @@ The game is recognised by the installer's file name; if the name is not one the 
 - **Wrong installer**: Make sure you're using the offline backup installer from GOG, not the Galaxy installer.
 - Game-specific problems are in each game's guide.
 
+## Development
+
+`bun install` or any `make` target that needs it turns on the hooks in `.githooks/`: a commit formats its staged files, and a push is refused while anything is unformatted. `make lint test` runs the same checks as CI.
+
 ## License
 
 See [LICENSE](LICENSE) if included, or refer to the repository's license file.

@@ -1,0 +1,10 @@
+#!/bin/sh
+# Refuses a push when anything in the working tree is unformatted, what --no-verify on a commit let through.
+set -eu
+
+[ -d node_modules ] || bun install --frozen-lockfile
+
+bun run format:check || {
+  echo "Not pushed: run make format and commit the result." >&2
+  exit 1
+}
