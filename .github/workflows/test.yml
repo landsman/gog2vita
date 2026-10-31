@@ -19,4 +19,5 @@ jobs:
           bun-version-file: .tool-versions
       - run: bun install --frozen-lockfile
       - run: bun check
+      - run: bun run lint
       - run: bun test

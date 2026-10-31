@@ -32,8 +32,13 @@ deps: ## install innoextract and 7-Zip with brew or apt
 
 ##@ Quality assurance
 .PHONY: lint
-lint: node_modules ## check the types
+lint: node_modules ## check the types, the formatting and the lint rules
 	bun check
+	bun run lint
+
+.PHONY: format
+format: node_modules ## rewrite the files to the formatter's layout
+	bun run format
 
 .PHONY: test
 test: node_modules ## run the tests against a fake installer layout
