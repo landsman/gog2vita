@@ -1,8 +1,7 @@
-import { chmodSync, statSync } from "node:fs";
+import { chmodSync, readdirSync, statSync } from "node:fs";
 import { basename, dirname, extname } from "node:path";
 import { match } from "ts-pattern";
 import type { Game } from "#game/game";
-import { findFiles } from "#lib/files";
 
 /** The folder to collect from: the given one as it is, or an installer unpacked into tmp. */
 export async function unpack(installer: string, tmp: string, game: Game): Promise<string> {
@@ -21,10 +20,13 @@ export async function unpack(installer: string, tmp: string, game: Game): Promis
 async function extractExe(installer: string, tmp: string, innoextractArgs: string[]): Promise<boolean> {
   const dir = dirname(installer);
   const name = basename(installer);
-  const parts = findFiles(dir, `${escapeGlob(basename(name, extname(name)))}-*.bin`);
+  const stem = basename(name, extname(name));
+  const parts = readdirSync(dir)
+    .filter((file) => file.startsWith(`${stem}-`) && file.endsWith(".bin"))
+    .sort();
   if (parts.length > 0) {
     console.log(`Detected ${parts.length} multi-part BIN file(s):`);
-    for (const part of parts) console.log(`  - ${basename(part)}`);
+    for (const part of parts) console.log(`  - ${part}`);
     console.log();
   }
 
@@ -40,11 +42,6 @@ async function extractExe(installer: string, tmp: string, innoextractArgs: strin
   console.error("  - or 7-Zip: brew install p7zip / apt install p7zip-full / choco install 7zip");
   console.error("\nAlso make sure ALL .bin files are in the same folder as the .exe!");
   return false;
-}
-
-/** Parentheses and brackets in a GOG file name are literal, not glob syntax. */
-function escapeGlob(text: string): string {
-  return text.replace(/[\\*?[\]{}()!]/g, "\\$&");
 }
 
 /** Extract a Linux .sh installer. */
