@@ -7,6 +7,7 @@ import { GAMES, chooseGame, detectGame } from "#game/index";
 import { pickInstaller } from "#lib/pick_installer";
 import { unpack } from "#lib/unpack";
 import { downloadVpk } from "#lib/vpk";
+import { accent, failure, heading, success, warning } from "#lib/style";
 
 const ROOT = join(import.meta.dir, "..");
 
@@ -16,7 +17,7 @@ if (import.meta.main) {
     // the open line reader on stdin would otherwise keep a terminal run alive
     process.exit(0);
   } catch (error) {
-    console.error(`\nError: ${error instanceof Error ? error.message : error}`);
+    console.error(failure(`\nError: ${error instanceof Error ? error.message : error}`));
     process.exit(1);
   }
 }
@@ -39,23 +40,23 @@ async function main(args: string[]): Promise<void> {
   const outputParent = join(ROOT, game.out);
   const outputData = join(outputParent, game.data);
 
-  console.log(`Extracting GOG installer: ${basename(installer)} (${game.title})`);
+  console.log(heading(`Extracting ${basename(installer)} (${game.title})`));
   console.log(`Working directory: ${dirname(installer)}`);
-  console.log(`Output will be: ${outputData}\n`);
+  console.log(`Output will be: ${accent(outputData)}\n`);
 
   const tmp = mkdtempSync(join(tmpdir(), "gog2vita-"));
   try {
     const source = await unpack(installer, tmp, game);
-    console.log(`Extraction complete! Collecting ${game.port} game files...`);
+    console.log(heading(`Collecting ${game.port} game files...`));
     const { copied, missing } = await game.collect(source, outputData);
 
-    console.log("\n=== Extraction Summary ===");
+    console.log(heading("\n=== Extraction Summary ==="));
     if (copied.length > 0) {
       console.log("Copied files/directories:");
       for (const item of [...new Set(copied)].sort()) console.log(`  - ${item}`);
     }
     if (missing.length > 0) {
-      console.log("\nWarning: Missing required files:");
+      console.error(warning("\nWarning: Missing required files:"));
       for (const item of missing) console.log(`  - ${item}`);
       throw new Error(
         "Your installation may be incomplete. Verify your GOG download is intact. Nothing was written to the output folder.",
@@ -65,20 +66,20 @@ async function main(args: string[]): Promise<void> {
     rmSync(tmp, { recursive: true, force: true });
   }
 
-  console.log("\nAll required files were found!\n");
+  console.log(success("\nAll required files were found!\n"));
   const tag = await downloadVpk(game, outputParent);
 
-  console.log("\n=== READY FOR PS VITA ===");
-  console.log(`Game data prepared at: ${outputParent}\n`);
-  console.log("Transfer steps:");
+  console.log(success("\n=== READY FOR PS VITA ==="));
+  console.log(`Game data prepared at: ${accent(outputParent)}\n`);
+  console.log(heading("Transfer steps:"));
   console.log(
     tag !== undefined
-      ? `1. Install ${game.out}/${game.vpk} (${tag}) with VitaShell`
+      ? `1. Install ${accent(`${game.out}/${game.vpk}`)} (${tag}) with VitaShell`
       : `1. Install ${game.vpk} from https://github.com/${game.repo}/releases with VitaShell`,
   );
-  console.log(`2. Copy the contents of '${game.out}/${game.data}/' so they end up in`);
-  console.log(`   ${game.vitaPath} (create the folder if needed)`);
-  if (game.note !== "") console.log(`\n${game.note}`);
+  console.log(`2. Copy the contents of ${accent(`${game.out}/${game.data}/`)} so they end up in`);
+  console.log(`   ${accent(game.vitaPath)} (create the folder if needed)`);
+  if (game.note !== "") console.error(warning(`\n${game.note}`));
 }
 
 function printUsage(): void {
