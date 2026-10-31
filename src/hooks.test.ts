@@ -1,5 +1,5 @@
 import { beforeEach, expect, test } from "bun:test";
-import { cpSync, mkdtempSync, symlinkSync, writeFileSync } from "node:fs";
+import { cpSync, mkdirSync, mkdtempSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
@@ -19,7 +19,7 @@ beforeEach(async () => {
   cpSync(join(ROOT, ".githooks"), join(repo, ".githooks"), { recursive: true });
   cpSync(join(ROOT, "package.json"), join(repo, "package.json"));
   symlinkSync(join(ROOT, "node_modules"), join(repo, "node_modules"), "junction");
-  writeFileSync(join(repo, ".gitignore"), "node_modules\n");
+  cpSync(join(ROOT, ".gitignore"), join(repo, ".gitignore"));
   await git(repo, "config", "core.hooksPath", ".githooks");
   await git(repo, "remote", "add", "origin", origin);
   await git(repo, "add", ".");
@@ -87,4 +87,12 @@ test("a push is refused while a file is unformatted", async () => {
   await git(repo, "add", "a.ts");
   await git(repo, "commit", "-m", "formatted");
   expect((await git(repo, "push", "origin", "HEAD:refs/heads/main")).exitCode).toBe(0);
+});
+
+test("a push ignores what sits in an agent's worktree", async () => {
+  mkdirSync(join(repo, ".claude/worktrees/other"), { recursive: true });
+  writeFileSync(join(repo, ".claude/worktrees/other/a.ts"), UNFORMATTED);
+
+  expect((await git(repo, "push", "origin", "HEAD:refs/heads/main")).exitCode).toBe(0);
+  expect(await Bun.file(join(repo, ".claude/worktrees/other/a.ts")).text()).toBe(UNFORMATTED);
 });
