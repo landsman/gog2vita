@@ -1,0 +1,15 @@
+{
+  "name": "gog2vita",
+  "private": true,
+  "type": "module",
+  "imports": {
+    "#game/*": "./src/game/*.ts",
+    "#lib/*": "./src/lib/*.ts"
+  },
+  "dependencies": {
+    "ts-pattern": "5.9.2"
+  },
+  "devDependencies": {
+    "@types/bun": "1.4.4"
+  }
+}

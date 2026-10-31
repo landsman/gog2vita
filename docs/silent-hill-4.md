@@ -21,7 +21,7 @@ games-gog/
 make extract
 ```
 
-On Windows: `python src\extract_for_vita.py`. It asks which game language you want: English, French, German, Italian or Spanish.
+On Windows: `bun install`, then `bun src\extract_for_vita.ts`. It asks which game language you want: English, French, German, Italian or Spanish.
 
 `sh4prep` has builds for Apple Silicon macOS, x86-64 Linux and Windows. Elsewhere the script stops; build `tools/sh4prep` from the port's source.
 

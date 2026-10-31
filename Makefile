@@ -1,6 +1,5 @@
 .DEFAULT_GOAL := help
-PYTHON ?= python3
-SCRIPT := src/extract_for_vita.py
+SCRIPT := src/extract_for_vita.ts
 INSTALLER ?=
 
 .PHONY: help
@@ -11,17 +10,21 @@ help: ## show this help
 
 ##@ Extraction
 .PHONY: extract
-extract: ## extract game data, asks which installer in games-gog/ when there are several
-	$(PYTHON) $(SCRIPT) $(if $(INSTALLER),"$(INSTALLER)")
+extract: node_modules ## extract game data, asks which installer in games-gog/ when there are several
+	bun $(SCRIPT) $(if $(INSTALLER),"$(INSTALLER)")
 
 .PHONY: clean
 clean: ## delete the extracted game data
 	rm -rf games-vita
 
 ##@ Setup
+node_modules: package.json bun.lock
+	bun install --frozen-lockfile
+	@touch node_modules
+
 .PHONY: tools
 tools: ## list which extraction tools are on PATH
-	@for t in innoextract 7z 7zz 7za unzip; do printf '%-12s %s\n' $$t "$$(command -v $$t || echo missing)"; done
+	@for t in bun innoextract 7z 7zz 7za unzip; do printf '%-12s %s\n' $$t "$$(command -v $$t || echo missing)"; done
 
 .PHONY: deps
 deps: ## install innoextract and 7-Zip with brew or apt
@@ -29,9 +32,9 @@ deps: ## install innoextract and 7-Zip with brew or apt
 
 ##@ Quality assurance
 .PHONY: lint
-lint: ## check the scripts compile
-	$(PYTHON) -m py_compile src/*.py src/game/*.py
+lint: node_modules ## check the types
+	bun check
 
 .PHONY: test
-test: ## run the tests against a fake installer layout
-	@for t in src/*.test.py; do PYTHONDONTWRITEBYTECODE=1 $(PYTHON) $$t -v || exit 1; done
+test: node_modules ## run the tests against a fake installer layout
+	bun test

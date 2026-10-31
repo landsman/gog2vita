@@ -13,7 +13,7 @@ A cross-platform one-command script that takes the offline installer of a game y
 | [Diablo + Hellfire](https://www.gog.com/en/game/diablo) | [DevilutionX](https://github.com/diasurgical/devilutionX) | `ux0:data/diasurgical/devilution/` | [docs/diablo.md](docs/diablo.md) |
 | [Silent Hill 4: The Room](https://www.gog.com/en/game/silent_hill_4_the_room) | [sh4vita](https://github.com/vallfrr/sh4vita) | `ux0:data/sh4/` | [docs/silent-hill-4.md](docs/silent-hill-4.md) |
 
-Each game is one module in [`src/game/`](src/game/); adding a game means adding a module there and listing it in `src/game/__init__.py`.
+Each game is one module in [`src/game/`](src/game/); adding a game means adding a module there that exports a [`Game`](src/game/game.ts) and listing it in `src/game/index.ts`.
 
 ## Supported Platforms
 
@@ -23,7 +23,9 @@ Each game is one module in [`src/game/`](src/game/); adding a game means adding 
 
 ## Requirements
 
-You need at least one of the following extraction tools installed and available in your PATH:
+You need [Bun](https://bun.com/docs/installation) to run the script, the version in `.tool-versions`.
+
+You also need at least one of the following extraction tools installed and available in your PATH:
 
 | Tool | Recommended For | Installation |
 |---|---|---|
@@ -54,8 +56,9 @@ To use an installer somewhere else, pass it directly: `make extract INSTALLER="$
 ### Windows (Command Prompt/PowerShell)
 
 ```powershell
-python src\extract_for_vita.py
-python src\extract_for_vita.py "games-gog\setup_diablo_1.09_hellfire_v4_(78466).exe"
+bun install
+bun src\extract_for_vita.ts
+bun src\extract_for_vita.ts "games-gog\setup_diablo_1.09_hellfire_v4_(78466).exe"
 ```
 
 The game is recognised by the installer's file name; if the name is not one the script knows, it asks which game it is. The output lands in `games-vita/` in this repository, one folder per port — `openmohaa/main/`, `diasurgical/devilution/` or `sh4vita/sh4/` — laid out the way `ux0:data/` expects it, and the game's guide says where it goes on the Vita.
