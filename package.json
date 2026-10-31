@@ -2,14 +2,14 @@
   "name": "gog2vita",
   "private": true,
   "type": "module",
-  "scripts": {
-    "format": "oxfmt --ignore-path=.gitignore .",
-    "lint": "oxfmt --check --ignore-path=.gitignore . && oxlint --deny-warnings src"
-  },
   "imports": {
     "#src/*": "./src/*.ts",
     "#game/*": "./src/game/*.ts",
     "#lib/*": "./src/lib/*.ts"
+  },
+  "scripts": {
+    "format": "oxfmt --ignore-path=.gitignore .",
+    "lint": "oxfmt --check --ignore-path=.gitignore . && oxlint --deny-warnings src"
   },
   "dependencies": {
     "ts-pattern": "5.9.2"

@@ -1,6 +1,6 @@
 # Diablo + Hellfire
 
-Extracts the game data from your GOG.com copy of *[Diablo + Hellfire](https://www.gog.com/en/game/diablo)* and prepares it for [DevilutionX](https://github.com/diasurgical/devilutionX), which runs on the PS Vita among many other systems.
+Extracts the game data from your GOG.com copy of _[Diablo + Hellfire](https://www.gog.com/en/game/diablo)_ and prepares it for [DevilutionX](https://github.com/diasurgical/devilutionX), which runs on the PS Vita among many other systems.
 
 ## Usage
 
@@ -34,9 +34,9 @@ games-vita/diasurgical/
 
 ## What Gets Extracted
 
-| File | Requirement | Notes |
-|---|---|---|
-| `DIABDAT.MPQ` | Required | The base game. |
+| File                                                       | Requirement         | Notes                   |
+| ---------------------------------------------------------- | ------------------- | ----------------------- |
+| `DIABDAT.MPQ`                                              | Required            | The base game.          |
 | `hellfire.mpq`, `hfmonk.mpq`, `hfmusic.mpq`, `hfvoice.mpq` | Copied when present | The Hellfire expansion. |
 
 The rest of the installer — the original Windows executables, DirectX redistributables, manuals and `Patch_rt.mpq` — is left out.

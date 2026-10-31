@@ -1,6 +1,6 @@
 # Medal of Honor: Allied Assault
 
-Extracts the game data from your GOG.com copy of *Medal of Honor: Allied Assault* and prepares it for [OpenMoHAA for PS Vita](https://github.com/HenryKun55/openmohaa), HenryKun55's Vita port of [OpenMoHAA](https://github.com/openmoh/openmohaa).
+Extracts the game data from your GOG.com copy of _Medal of Honor: Allied Assault_ and prepares it for [OpenMoHAA for PS Vita](https://github.com/HenryKun55/openmohaa), HenryKun55's Vita port of [OpenMoHAA](https://github.com/openmoh/openmohaa).
 
 GOG ships it as a multi-part installer (`.exe` + `-*.bin` files); the extractor picks the parts up and creates a ready-to-transfer `main/` folder.
 
@@ -8,7 +8,7 @@ GOG ships it as a multi-part installer (`.exe` + `-*.bin` files); the extractor 
 
 ### 1. Download your GOG installer files
 
-From your GOG account, download the offline backup installer for *[Medal of Honor: Allied Assault](https://www.gog.com/en/account)* and put the files in the `games-gog/` folder of this repository. For recent versions, that looks like this:
+From your GOG account, download the offline backup installer for _[Medal of Honor: Allied Assault](https://www.gog.com/en/account)_ and put the files in the `games-gog/` folder of this repository. For recent versions, that looks like this:
 
 ```text
 games-gog/
@@ -45,6 +45,7 @@ games-vita/openmohaa/
    ```
 
    Create `ux0:data/openmohaa/` first if it doesn't exist.
+
 4. Launch OpenMoHAA from LiveArea.
 
 > [!NOTE]
@@ -56,14 +57,14 @@ The release also offers optional `lang_*.pk3` packs that translate the menu pict
 
 The script collects the files the port's [install guide](https://github.com/HenryKun55/openmohaa/blob/vita-port/docs/PORTING-VITA.md#install-on-the-vita) asks for, from the base game's `main/` folder only:
 
-| File or folder | Requirement | Notes |
-|---|---|---|
-| `Pak0.pk3` – `Pak3.pk3` | Required | Base-game data. |
-| `Pak4.pk3` – `Pak5.pk3` | Required | Data from the official 1.11 update. |
-| Other `Pak*.pk3` files | Copied when present | Language and additional official data such as `Pak6EnUk.pk3` or `pak7.pk3`. |
-| `music/` | Copied when present | Loose background-music files stored outside the paks. |
-| `sound/` | Copied when present | Loose audio, copied with its subfolders and file names as the installer has them. |
-| `video/` | Copied when present | RoQ intro and cinematic files stored outside the paks. |
+| File or folder          | Requirement         | Notes                                                                             |
+| ----------------------- | ------------------- | --------------------------------------------------------------------------------- |
+| `Pak0.pk3` – `Pak3.pk3` | Required            | Base-game data.                                                                   |
+| `Pak4.pk3` – `Pak5.pk3` | Required            | Data from the official 1.11 update.                                               |
+| Other `Pak*.pk3` files  | Copied when present | Language and additional official data such as `Pak6EnUk.pk3` or `pak7.pk3`.       |
+| `music/`                | Copied when present | Loose background-music files stored outside the paks.                             |
+| `sound/`                | Copied when present | Loose audio, copied with its subfolders and file names as the installer has them. |
+| `video/`                | Copied when present | RoQ intro and cinematic files stored outside the paks.                            |
 
 If the installer also carries the expansions (`mainta/`, `maintt/`), their files are left out.
 

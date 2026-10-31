@@ -7,11 +7,11 @@ A cross-platform one-command script that takes the offline installer of a game y
 
 ## Supported games
 
-| Game | Vita port | Data on the Vita | Guide |
-|---|---|---|---|
-| [Medal of Honor: Allied Assault](https://www.gog.com/en/game/medal_of_honor_allied_assault_war_chest) | [OpenMoHAA](https://github.com/HenryKun55/openmohaa) | `ux0:data/openmohaa/main/` | [docs/mohaa.md](docs/mohaa.md) |
-| [Diablo + Hellfire](https://www.gog.com/en/game/diablo) | [DevilutionX](https://github.com/diasurgical/devilutionX) | `ux0:data/diasurgical/devilution/` | [docs/diablo.md](docs/diablo.md) |
-| [Silent Hill 4: The Room](https://www.gog.com/en/game/silent_hill_4_the_room) | [sh4vita](https://github.com/vallfrr/sh4vita) | `ux0:data/sh4/` | [docs/silent-hill-4.md](docs/silent-hill-4.md) |
+| Game                                                                                                  | Vita port                                                 | Data on the Vita                   | Guide                                          |
+| ----------------------------------------------------------------------------------------------------- | --------------------------------------------------------- | ---------------------------------- | ---------------------------------------------- |
+| [Medal of Honor: Allied Assault](https://www.gog.com/en/game/medal_of_honor_allied_assault_war_chest) | [OpenMoHAA](https://github.com/HenryKun55/openmohaa)      | `ux0:data/openmohaa/main/`         | [docs/mohaa.md](docs/mohaa.md)                 |
+| [Diablo + Hellfire](https://www.gog.com/en/game/diablo)                                               | [DevilutionX](https://github.com/diasurgical/devilutionX) | `ux0:data/diasurgical/devilution/` | [docs/diablo.md](docs/diablo.md)               |
+| [Silent Hill 4: The Room](https://www.gog.com/en/game/silent_hill_4_the_room)                         | [sh4vita](https://github.com/vallfrr/sh4vita)             | `ux0:data/sh4/`                    | [docs/silent-hill-4.md](docs/silent-hill-4.md) |
 
 Each game is one module in [`src/game/`](src/game/); adding a game means adding a module there that exports a [`Game`](src/game/game.ts) and listing it in `src/game/index.ts`.
 
@@ -27,11 +27,11 @@ You need [Bun](https://bun.com/docs/installation) to run the script, the version
 
 You also need at least one of the following extraction tools installed and available in your PATH:
 
-| Tool | Recommended For | Installation |
-|---|---|---|
-| [`innoextract`](https://constexpr.org/innoextract/) | Windows `.exe` installers (best) | **macOS:** `brew install innoextract` • **Linux:** `sudo apt install innoextract` • **Windows:** `choco install innoextract` |
-| [`7-Zip`](https://www.7-zip.org/) (`7z`) | Fallback for multi-part installers | **macOS:** `brew install p7zip` • **Linux:** `sudo apt install p7zip-full` • **Windows:** [Download from 7-zip.org](https://www.7-zip.org/) (add to PATH) |
-| [`unzip`](https://linux.die.net/man/1/unzip) | Linux `.sh` installers | Usually pre-installed on most systems |
+| Tool                                                | Recommended For                    | Installation                                                                                                                                              |
+| --------------------------------------------------- | ---------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [`innoextract`](https://constexpr.org/innoextract/) | Windows `.exe` installers (best)   | **macOS:** `brew install innoextract` • **Linux:** `sudo apt install innoextract` • **Windows:** `choco install innoextract`                              |
+| [`7-Zip`](https://www.7-zip.org/) (`7z`)            | Fallback for multi-part installers | **macOS:** `brew install p7zip` • **Linux:** `sudo apt install p7zip-full` • **Windows:** [Download from 7-zip.org](https://www.7-zip.org/) (add to PATH) |
+| [`unzip`](https://linux.die.net/man/1/unzip)        | Linux `.sh` installers             | Usually pre-installed on most systems                                                                                                                     |
 
 On macOS and Linux, `make tools` shows which of these are installed, and `make deps` installs innoextract and 7-Zip with `brew` or `apt`.
 

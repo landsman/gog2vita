@@ -27,16 +27,15 @@ async function main(args: string[]): Promise<void> {
     process.exit(1);
   }
 
-  const picked = args[0] !== undefined
-    ? { installer: args[0], game: undefined }
-    : await pickInstaller(join(ROOT, "games-gog"));
+  const picked =
+    args[0] !== undefined ? { installer: args[0], game: undefined } : await pickInstaller(join(ROOT, "games-gog"));
   if (picked.installer === undefined) throw new Error("no installer given");
 
   const path = picked.installer.replace(/^~(?=[/\\]|$)/, homedir());
   if (!existsSync(path)) throw new Error(`Installer not found: ${path}`);
   const installer = realpathSync(path);
 
-  const game = detectGame(basename(installer)) ?? picked.game ?? await askWhichGame(installer);
+  const game = detectGame(basename(installer)) ?? picked.game ?? (await askWhichGame(installer));
   const outputParent = join(ROOT, game.out);
   const outputData = join(outputParent, game.data);
 
@@ -58,7 +57,9 @@ async function main(args: string[]): Promise<void> {
     if (missing.length > 0) {
       console.log("\nWarning: Missing required files:");
       for (const item of missing) console.log(`  - ${item}`);
-      throw new Error("Your installation may be incomplete. Verify your GOG download is intact. Nothing was written to the output folder.");
+      throw new Error(
+        "Your installation may be incomplete. Verify your GOG download is intact. Nothing was written to the output folder.",
+      );
     }
   } finally {
     rmSync(tmp, { recursive: true, force: true });
@@ -70,9 +71,11 @@ async function main(args: string[]): Promise<void> {
   console.log("\n=== READY FOR PS VITA ===");
   console.log(`Game data prepared at: ${outputParent}\n`);
   console.log("Transfer steps:");
-  console.log(tag !== undefined
-    ? `1. Install ${game.out}/${game.vpk} (${tag}) with VitaShell`
-    : `1. Install ${game.vpk} from https://github.com/${game.repo}/releases with VitaShell`);
+  console.log(
+    tag !== undefined
+      ? `1. Install ${game.out}/${game.vpk} (${tag}) with VitaShell`
+      : `1. Install ${game.vpk} from https://github.com/${game.repo}/releases with VitaShell`,
+  );
   console.log(`2. Copy the contents of '${game.out}/${game.data}/' so they end up in`);
   console.log(`   ${game.vitaPath} (create the folder if needed)`);
   if (game.note !== "") console.log(`\n${game.note}`);
@@ -96,7 +99,10 @@ export async function pickInstaller(gogDir: string): Promise<Picked> {
     .with([P.string], ([only]) => ({ installer: only, game }))
     .otherwise(async () => {
       console.log(`Installers in ${gogDir}:`);
-      const index = await choose("Which one", found.map((f) => basename(f)));
+      const index = await choose(
+        "Which one",
+        found.map((f) => basename(f)),
+      );
       return { installer: found[index], game };
     });
 }
@@ -120,7 +126,10 @@ type Picked = { installer: string | undefined; game: Game };
 
 /** What in gogDir can be this game: named for it, or a name no game claims. */
 function installersFor(game: Game, gogDir: string): string[] {
-  const folders = readdirSync(gogDir).map((name) => join(gogDir, name)).filter((p) => statSync(p).isDirectory()).sort();
+  const folders = readdirSync(gogDir)
+    .map((name) => join(gogDir, name))
+    .filter((p) => statSync(p).isDirectory())
+    .sort();
   const found = [...findFiles(gogDir, "setup_*.exe"), ...findFiles(gogDir, "*.sh"), ...folders];
   return found.filter((f) => {
     const detected = detectGame(basename(f));
@@ -144,7 +153,10 @@ async function askWhichGame(installer: string): Promise<Game> {
 }
 
 async function chooseGame(): Promise<Game> {
-  const index = await choose("Game", GAMES.map((g) => `${g.title} for ${g.port}`));
+  const index = await choose(
+    "Game",
+    GAMES.map((g) => `${g.title} for ${g.port}`),
+  );
   const game = GAMES[index];
   if (game === undefined) throw new Error(`choose returned ${index}, outside the list it was given`);
   return game;
@@ -181,9 +193,10 @@ async function extractExe(installer: string, tmp: string, innoextractArgs: strin
   }
 
   const innoextract = Bun.which("innoextract");
-  if (innoextract !== null && await tryRun("innoextract", [innoextract, ...innoextractArgs, name, "-d", tmp], dir)) return true;
+  if (innoextract !== null && (await tryRun("innoextract", [innoextract, ...innoextractArgs, name, "-d", tmp], dir)))
+    return true;
   const sevenZip = findSevenZip();
-  if (sevenZip !== null && await tryRun("7-Zip", [sevenZip, "x", name, `-o${tmp}`, "-y", "-bsp1"], dir)) return true;
+  if (sevenZip !== null && (await tryRun("7-Zip", [sevenZip, "x", name, `-o${tmp}`, "-y", "-bsp1"], dir))) return true;
 
   console.error("Error: Could not extract .exe file.");
   console.error("Ensure the following are installed and in your PATH:");
@@ -204,13 +217,13 @@ async function extractSh(installer: string, tmp: string): Promise<boolean> {
   const name = basename(installer);
 
   const unzip = Bun.which("unzip");
-  if (unzip !== null && await tryRun("unzip", [unzip, "-o", name, "-d", tmp], dir)) return true;
+  if (unzip !== null && (await tryRun("unzip", [unzip, "-o", name, "-d", tmp], dir))) return true;
 
   if (process.platform !== "win32") chmodSync(installer, 0o755);
   if (await tryRun("Self-extraction", [installer, "--noexec", "--target", tmp], dir)) return true;
 
   const sevenZip = findSevenZip();
-  if (sevenZip !== null && await tryRun("7-Zip", [sevenZip, "x", name, `-o${tmp}`, "-y"], dir)) return true;
+  if (sevenZip !== null && (await tryRun("7-Zip", [sevenZip, "x", name, `-o${tmp}`, "-y"], dir))) return true;
 
   console.error("Error: Could not extract .sh file.");
   return false;
@@ -236,7 +249,9 @@ async function tryRun(label: string, cmd: string[], cwd: string): Promise<boolea
 async function downloadVpk(game: Game, outputParent: string): Promise<string | undefined> {
   const page = `https://github.com/${game.repo}/releases`;
   try {
-    const api = await fetch(`https://api.github.com/repos/${game.repo}/releases`, { signal: AbortSignal.timeout(30_000) });
+    const api = await fetch(`https://api.github.com/repos/${game.repo}/releases`, {
+      signal: AbortSignal.timeout(30_000),
+    });
     if (!api.ok) throw new Error(`HTTP ${api.status}`);
     const found = newestVpk(await api.json(), game.vpk);
     if (found === undefined) {
@@ -251,7 +266,9 @@ async function downloadVpk(game: Game, outputParent: string): Promise<string | u
     renameSync(part, join(outputParent, game.vpk));
     return found.tag;
   } catch (error) {
-    console.error(`Warning: could not download ${game.vpk} (${error instanceof Error ? error.message : error}); get it from ${page}`);
+    console.error(
+      `Warning: could not download ${game.vpk} (${error instanceof Error ? error.message : error}); get it from ${page}`,
+    );
     return undefined;
   }
 }
@@ -275,7 +292,9 @@ type Release = {
 
 function isRelease(value: unknown): value is Release {
   const release = value as Partial<Release> | null;
-  return typeof release?.tag_name === "string"
-    && Array.isArray(release.assets)
-    && release.assets.every((a) => typeof a?.name === "string" && typeof a?.browser_download_url === "string");
+  return (
+    typeof release?.tag_name === "string" &&
+    Array.isArray(release.assets) &&
+    release.assets.every((a) => typeof a?.name === "string" && typeof a?.browser_download_url === "string")
+  );
 }

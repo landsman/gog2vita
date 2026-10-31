@@ -53,7 +53,11 @@ describe("Medal of Honor", () => {
     const { copied, missing } = await collect(src, out);
 
     expect(missing).toEqual([]);
-    expect(readdirSync(out).filter((f) => f.endsWith(".pk3")).sort()).toEqual([0, 1, 2, 3, 4, 5].map((n) => `Pak${n}.pk3`));
+    expect(
+      readdirSync(out)
+        .filter((f) => f.endsWith(".pk3"))
+        .sort(),
+    ).toEqual([0, 1, 2, 3, 4, 5].map((n) => `Pak${n}.pk3`));
     expect(readFileSync(join(out, "Pak1.pk3"), "utf8")).toBe("base");
     expect(readdirSync(join(out, "sound"))).toEqual(["a.wav"]);
     expect(copied).toContain("sound/");
@@ -78,7 +82,13 @@ describe("Diablo", () => {
     touch(join(out, "stale.mpq"));
 
     expect((await collect(src, out)).missing).toEqual([]);
-    expect(readdirSync(out).sort()).toEqual(["DIABDAT.MPQ", "hellfire.mpq", "hfmonk.mpq", "hfmusic.mpq", "hfvoice.mpq"]);
+    expect(readdirSync(out).sort()).toEqual([
+      "DIABDAT.MPQ",
+      "hellfire.mpq",
+      "hfmonk.mpq",
+      "hfmusic.mpq",
+      "hfvoice.mpq",
+    ]);
   });
 
   test("a missing DIABDAT leaves the output alone", async () => {
@@ -103,9 +113,13 @@ describe("Silent Hill 4", () => {
 
   function mockPreparer(exitCode: number) {
     pretendHost("linux", "x64");
-    const download = spyOn(globalThis, "fetch").mockImplementation((async () => new Response("binary")) as unknown as typeof fetch);
-    const spawn = spyOn(Bun, "spawn").mockImplementation((() => ({ exited: Promise.resolve(exitCode) })) as unknown as typeof Bun.spawn);
-    const command = () => (spawn.mock.calls[0]?.[0] as unknown as { cmd: string[] }).cmd;
+    const download = spyOn(globalThis, "fetch").mockImplementation(
+      (async () => new Response("binary")) as unknown as typeof fetch,
+    );
+    const spawn = spyOn(Bun, "spawn").mockImplementation((() => ({
+      exited: Promise.resolve(exitCode),
+    })) as unknown as typeof Bun.spawn);
+    const command = () => (spawn.mock.lastCall as unknown as [{ cmd: string[] }])[0].cmd;
     return { download, command };
   }
 

@@ -45,7 +45,8 @@ async function collect(sourceDir: string, outputDir: string): Promise<Collected>
 
   const host = `${process.platform} ${process.arch}`;
   const asset = PREPARERS[host];
-  if (asset === undefined) throw new Error(`${REPO} ships no sh4prep for ${host}; build tools/sh4prep from its source.`);
+  if (asset === undefined)
+    throw new Error(`${REPO} ships no sh4prep for ${host}; build tools/sh4prep from its source.`);
 
   const language = await askLanguage();
   const tmp = mkdtempSync(join(tmpdir(), "sh4prep-"));
