@@ -1,28 +1,10 @@
+import { answers } from "#lib/test_answers";
 import { afterEach, beforeEach, describe, expect, mock, spyOn, test } from "bun:test";
-import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdtempSync, readdirSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { basename, dirname, join } from "node:path";
-
-const answers: string[] = [];
-mock.module("#lib/ask", () => {
-  const ask = async () => answers.shift() ?? "";
-  return {
-    ask,
-    choose: async (_question: string, labels: string[]) => {
-      const index = Number(await ask()) - 1;
-      if (labels[index] === undefined) throw new Error("the test answered outside the list");
-      return index;
-    },
-  };
-});
-
-const { detectGame, newestVpk, pickInstaller } = await import("#src/extract_for_vita");
-const { GAMES } = await import("#game/index");
-
-function touch(path: string, text = ""): void {
-  mkdirSync(dirname(path), { recursive: true });
-  writeFileSync(path, text);
-}
+import { dirname, join } from "node:path";
+import { detectGame, GAMES } from "#game/index";
+import { touch } from "#lib/test_answers";
 
 function game(port: string) {
   const found = GAMES.find((g) => g.port === port);
@@ -171,46 +153,7 @@ describe("detectGame", () => {
     expect(detectGame("setup_diablo_1.09_hellfire_v4_(78466).exe")?.port).toBe("DevilutionX");
     expect(detectGame("setup_medal_of_honor_2.0.0.21.exe")?.port).toBe("OpenMoHAA");
     expect(detectGame("setup_silent_hill_4_the_room_1.0_gog_v5_(80750).exe")?.port).toBe("sh4vita");
-    expect(detectGame("sh4")?.port).toBe("sh4vita");
+    expect(detectGame("SH4")?.port).toBe("sh4vita");
     expect(detectGame("setup_quake.exe")).toBeUndefined();
-  });
-});
-
-describe("pickInstaller", () => {
-  test("asks the game even with one installer and ignores other games", async () => {
-    mkdirSync(join(tmp, "gog/sh4"), { recursive: true });
-    touch(join(tmp, "gog/setup_diablo_1.09.exe"));
-
-    answers.push("3");
-    const sh4 = await pickInstaller(join(tmp, "gog"));
-    expect([basename(sh4.installer ?? ""), sh4.game.port]).toEqual(["sh4", "sh4vita"]);
-
-    answers.push("2");
-    const diablo = await pickInstaller(join(tmp, "gog"));
-    expect([basename(diablo.installer ?? ""), diablo.game.port]).toEqual(["setup_diablo_1.09.exe", "DevilutionX"]);
-  });
-});
-
-describe("newestVpk", () => {
-  const release = (tag: string, assets: string[], draft = false) => ({
-    tag_name: tag,
-    draft,
-    prerelease: true,
-    assets: assets.map((name) => ({ name, browser_download_url: `https://x/${tag}/${name}` })),
-  });
-
-  test("takes the newest release with a VPK, pre-releases included", () => {
-    const releases = [
-      release("v3", ["OpenMoHAA.vpk"], true),
-      release("v2", ["OpenMoHAA-Vita-symbols.zip"]),
-      release("v1", ["OpenMoHAA.vpk"]),
-    ];
-    expect(newestVpk(releases, "OpenMoHAA.vpk")).toEqual({ tag: "v1", url: "https://x/v1/OpenMoHAA.vpk" });
-    expect(newestVpk([], "OpenMoHAA.vpk")).toBeUndefined();
-  });
-
-  test("a malformed answer is not read as a release", () => {
-    expect(newestVpk([null, { tag_name: 1 }, { tag_name: "v1", assets: [{ name: 1 }] }], "x.vpk")).toBeUndefined();
-    expect(() => newestVpk({ message: "rate limited" }, "x.vpk")).toThrow("did not answer with a list");
   });
 });
