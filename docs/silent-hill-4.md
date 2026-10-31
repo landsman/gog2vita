@@ -1,6 +1,6 @@
 # Silent Hill 4: The Room
 
-Prepares your GOG.com copy of *[Silent Hill 4: The Room](https://www.gog.com/en/game/silent_hill_4_the_room)* for [sh4vita](https://github.com/vallfrr/sh4vita), a native PS Vita port. The preparing is done by the port's own `sh4prep`, which the script downloads and runs.
+Prepares your GOG.com copy of _[Silent Hill 4: The Room](https://www.gog.com/en/game/silent_hill_4_the_room)_ for [sh4vita](https://github.com/vallfrr/sh4vita), a native PS Vita port. The preparing is done by the port's own `sh4prep`, which the script downloads and runs.
 
 Only version **1.0 gog v5** works, because the VPK is recompiled from that exact executable; `sh4prep` rejects any other.
 
@@ -21,7 +21,7 @@ games-gog/
 make extract
 ```
 
-On Windows: `python src\extract_for_vita.py`. It asks which game language you want: English, French, German, Italian or Spanish.
+On Windows: `bun install`, then `bun src\extract_for_vita.ts`. It asks which game language you want: English, French, German, Italian or Spanish.
 
 `sh4prep` has builds for Apple Silicon macOS, x86-64 Linux and Windows. Elsewhere the script stops; build `tools/sh4prep` from the port's source.
 

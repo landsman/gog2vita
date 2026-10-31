@@ -12,13 +12,11 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest]
     runs-on: ${{ matrix.os }}
-    defaults:
-      run:
-        shell: bash # Git Bash on Windows, so one loop serves both
     steps:
       - uses: actions/checkout@v7
-      - uses: actions/setup-python@v7
-        with:
-          python-version: "3.x"
-      - run: python -m py_compile src/*.py src/game/*.py
-      - run: for t in src/*.test.py; do python "$t" -v || exit 1; done
+      - uses: jdx/mise-action@v4
+      - run: bun install --frozen-lockfile
+      - run: bun check
+      - run: bun run lint
+      - run: shellcheck .githooks/pre-commit .githooks/pre-push
+      - run: bun test

@@ -1,6 +1,5 @@
 .DEFAULT_GOAL := help
-PYTHON ?= python3
-SCRIPT := src/extract_for_vita.py
+SCRIPT := src/extract_for_vita.ts
 INSTALLER ?=
 
 .PHONY: help
@@ -11,27 +10,38 @@ help: ## show this help
 
 ##@ Extraction
 .PHONY: extract
-extract: ## extract game data, asks which installer in games-gog/ when there are several
-	$(PYTHON) $(SCRIPT) $(if $(INSTALLER),"$(INSTALLER)")
+extract: node_modules ## extract game data, asks which installer in games-gog/ when there are several
+	bun $(SCRIPT) $(if $(INSTALLER),"$(INSTALLER)")
 
 .PHONY: clean
 clean: ## delete the extracted game data
 	rm -rf games-vita
 
 ##@ Setup
+node_modules: package.json bun.lock
+	bun install --frozen-lockfile
+	@touch node_modules
+
 .PHONY: tools
 tools: ## list which extraction tools are on PATH
-	@for t in innoextract 7z 7zz 7za unzip; do printf '%-12s %s\n' $$t "$$(command -v $$t || echo missing)"; done
+	@for t in mise bun shellcheck innoextract 7z 7zz 7za unzip; do printf '%-12s %s\n' $$t "$$(command -v $$t || echo missing)"; done
 
 .PHONY: deps
-deps: ## install innoextract and 7-Zip with brew or apt
-	@if command -v brew >/dev/null; then brew install innoextract p7zip; else sudo apt install -y innoextract p7zip-full; fi
+deps: ## install the mise tools, and innoextract with brew or apt
+	mise install
+	@if command -v brew >/dev/null; then brew install innoextract; else sudo apt install -y innoextract; fi
 
 ##@ Quality assurance
 .PHONY: lint
-lint: ## check the scripts compile
-	$(PYTHON) -m py_compile src/*.py src/game/*.py
+lint: node_modules ## check the types, the formatting and the lint rules
+	bun check
+	bun run lint
+	shellcheck .githooks/pre-commit .githooks/pre-push
+
+.PHONY: format
+format: node_modules ## rewrite the files to the formatter's layout
+	bun run format
 
 .PHONY: test
-test: ## run the tests against a fake installer layout
-	@for t in src/*.test.py; do PYTHONDONTWRITEBYTECODE=1 $(PYTHON) $$t -v || exit 1; done
+test: node_modules ## run the tests against a fake installer layout
+	bun test

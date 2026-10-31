@@ -1,0 +1,11 @@
+#!/bin/sh
+# Formats the staged files and stages the result, so a commit is always formatted.
+# A file staged only in part gets staged whole, because the formatter rewrites the working copy.
+set -eu
+
+[ -d node_modules ] || bun install --frozen-lockfile
+
+staged() { git diff --cached --name-only --diff-filter=ACMR -z; }
+
+staged | xargs -0 -r bun x oxfmt --ignore-path=.gitignore --no-error-on-unmatched-pattern
+staged | xargs -0 -r git add --

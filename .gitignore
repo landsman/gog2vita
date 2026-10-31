@@ -1,5 +1,5 @@
 /games-vita/
-__pycache__/
+node_modules/
 # GOG installer files, never committed
 /games-gog/*
 !/games-gog/.gitkeep
