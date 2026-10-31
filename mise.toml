@@ -1,0 +1,6 @@
+# Run `mise install`. innoextract is not in mise's registry, so `make deps` takes it from brew or apt.
+# oxfmt and oxlint are pinned in package.json, with the rest of what bun installs.
+[tools]
+bun = "1.4.3"
+7zip = "26.05"
+shellcheck = "0.11.0"

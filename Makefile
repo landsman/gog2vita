@@ -24,17 +24,19 @@ node_modules: package.json bun.lock
 
 .PHONY: tools
 tools: ## list which extraction tools are on PATH
-	@for t in bun innoextract 7z 7zz 7za unzip; do printf '%-12s %s\n' $$t "$$(command -v $$t || echo missing)"; done
+	@for t in mise bun shellcheck innoextract 7z 7zz 7za unzip; do printf '%-12s %s\n' $$t "$$(command -v $$t || echo missing)"; done
 
 .PHONY: deps
-deps: ## install innoextract and 7-Zip with brew or apt
-	@if command -v brew >/dev/null; then brew install innoextract p7zip; else sudo apt install -y innoextract p7zip-full; fi
+deps: ## install the mise tools, and innoextract with brew or apt
+	mise install
+	@if command -v brew >/dev/null; then brew install innoextract; else sudo apt install -y innoextract; fi
 
 ##@ Quality assurance
 .PHONY: lint
 lint: node_modules ## check the types, the formatting and the lint rules
 	bun check
 	bun run lint
+	shellcheck .githooks/pre-commit .githooks/pre-push
 
 .PHONY: format
 format: node_modules ## rewrite the files to the formatter's layout

@@ -23,7 +23,7 @@ Each game is one module in [`src/game/`](src/game/); adding a game means adding 
 
 ## Requirements
 
-You need [Bun](https://bun.com/docs/installation) to run the script, the version in `.tool-versions`.
+[mise](https://mise.jdx.dev/) installs the pinned tools from `mise.toml`, Bun and 7-Zip among them: run `mise install`. Without mise, install [Bun](https://bun.com/docs/installation) yourself.
 
 You also need at least one of the following extraction tools installed and available in your PATH:
 
@@ -33,7 +33,7 @@ You also need at least one of the following extraction tools installed and avail
 | [`7-Zip`](https://www.7-zip.org/) (`7z`)            | Fallback for multi-part installers | **macOS:** `brew install p7zip` • **Linux:** `sudo apt install p7zip-full` • **Windows:** [Download from 7-zip.org](https://www.7-zip.org/) (add to PATH) |
 | [`unzip`](https://linux.die.net/man/1/unzip)        | Linux `.sh` installers             | Usually pre-installed on most systems                                                                                                                     |
 
-When an installer needs a tool you do not have, the script offers to install it with `brew`, `apt` or `choco`. Silent Hill 4 needs `innoextract` itself; 7-Zip is enough for the other games. `make tools` shows what is installed, and `make deps` installs innoextract and 7-Zip in one go.
+When an installer needs a tool you do not have, the script offers to install it with `brew`, `apt` or `choco`. Silent Hill 4 needs `innoextract` itself; 7-Zip is enough for the other games. `make tools` shows what is installed, and `make deps` installs the mise tools and innoextract in one go.
 
 ## Usage
 
