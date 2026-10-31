@@ -5,17 +5,18 @@ import type { Game } from "#game/game";
 import { chooseGame, detectGame } from "#game/index";
 import { ask, choose } from "#lib/ask";
 import { findFiles } from "#lib/files";
+import { accent, step } from "#lib/style";
 
 /** The installer and its game after asking which game, and which installer when it has several. */
 export async function pickInstaller(gogDir: string): Promise<Picked> {
-  console.log("Which game do you want on the Vita?");
+  console.log(step("Which game do you want on the Vita?"));
   const game = await chooseGame();
   const found = installersFor(game, gogDir);
   return match(found)
     .with([], () => askForInstaller(game, gogDir))
     .with([P.string], ([only]) => ({ installer: only, game }))
     .otherwise(async () => {
-      console.log(`Installers in ${gogDir}:`);
+      console.log(step(`Installers in ${gogDir}:`));
       const index = await choose(
         "Which one",
         found.map((f) => basename(f)),
@@ -28,10 +29,10 @@ export async function pickInstaller(gogDir: string): Promise<Picked> {
 async function askForInstaller(game: Game, gogDir: string): Promise<Picked> {
   console.log(`Nothing for it in ${gogDir}.\n`);
   if ((await ask("Do you already own it on GOG? [y/N]:")).toLowerCase().startsWith("y")) {
-    console.log(`Download the offline installer (signed in):  ${link(game.download)}`);
+    console.log(`Download the offline installer (signed in):  ${accent(link(game.download))}`);
   } else {
-    console.log(`Buy it on GOG first:  ${link(game.gog)}`);
-    console.log(`then download the offline installer:  ${link(game.download)}`);
+    console.log(`Buy it on GOG first:  ${accent(link(game.gog))}`);
+    console.log(`then download the offline installer:  ${accent(link(game.download))}`);
   }
   console.log(`Put the .exe and its .bin files in ${gogDir}, or drag the .exe here.\n`);
   const answer = await ask("Path to the setup_*.exe (Enter to look in games-gog/ again):");

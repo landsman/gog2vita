@@ -1,4 +1,5 @@
 import { ask } from "#lib/ask";
+import { warning } from "#lib/style";
 
 export interface Tool {
   name: string;
@@ -28,7 +29,7 @@ export async function ensureTools(needed: Tool[][]): Promise<void> {
   if (missing.length === 0) return;
 
   const names = missing.map((tool) => tool.name).join(", ");
-  console.log(`This installer needs ${names}, which is not on your PATH.`);
+  console.error(warning(`This installer needs ${names}, which is not on your PATH.`));
   const manager = findPackageManager();
   if (manager === undefined) throw new Error(`Install ${names} and run this again.`);
 

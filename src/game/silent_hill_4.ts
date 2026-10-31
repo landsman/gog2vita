@@ -6,6 +6,7 @@ import { ask } from "#lib/ask";
 import { findFiles } from "#lib/files";
 import type { Collected, Game } from "#game/game";
 import { INNOEXTRACT } from "#lib/tools";
+import { accent, step } from "#lib/style";
 
 const EXE = "SILENT HILL 4.exe";
 const REPO = "vallfrr/sh4vita";
@@ -60,8 +61,10 @@ async function collect(sourceDir: string, outputDir: string): Promise<Collected>
     // writes <dirname(outputDir)>/sh4/; a rerun skips the files already copied
     const exitCode = await Bun.spawn({
       cmd: [preparer, dirname(exe), dirname(outputDir), language],
-      stdio: ["inherit", "inherit", "inherit"],
+      // its stdout only repeats what this script says at the end; the progress and errors are on stderr
+      stdio: ["inherit", "ignore", "inherit"],
     }).exited;
+    console.error();
     if (exitCode !== 0) throw new Error(`sh4prep failed with exit code ${exitCode}, see its output above.`);
   } finally {
     rmSync(tmp, { recursive: true, force: true });
@@ -71,7 +74,8 @@ async function collect(sourceDir: string, outputDir: string): Promise<Collected>
 
 /** English on a plain Enter, since most runs want it. */
 async function askLanguage(): Promise<string> {
-  LANGUAGES.forEach((language, n) => console.log(`  ${n + 1}) ${language}`));
+  console.log(step("Which language do you want the game in?"));
+  LANGUAGES.forEach((language, n) => console.log(`  ${accent(String(n + 1))}  ${language}`));
   while (true) {
     const answer = await ask(`Game language [1-${LANGUAGES.length}, Enter for ${LANGUAGES[0]}]:`);
     const language = match(answer)
@@ -83,7 +87,7 @@ async function askLanguage(): Promise<string> {
 }
 
 async function downloadPreparer(asset: string, to: string): Promise<void> {
-  console.log(`Downloading ${asset}...`);
+  console.log(step(`Downloading ${asset}`));
   // ponytail: latest skips pre-releases, unlike the VPK; pair them if the port starts shipping those
   const response = await fetch(`https://github.com/${REPO}/releases/latest/download/${asset}`);
   if (!response.ok) throw new Error(`Could not download ${asset} (HTTP ${response.status}).`);

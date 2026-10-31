@@ -3,6 +3,7 @@ import { basename, dirname, extname } from "node:path";
 import { match } from "ts-pattern";
 import type { Game } from "#game/game";
 import { ensureTools, SEVEN_ZIP } from "#lib/tools";
+import { failure, warning } from "#lib/style";
 
 /** The folder to collect from: the given one as it is, or an installer unpacked into tmp. */
 export async function unpack(installer: string, tmp: string, game: Game): Promise<string> {
@@ -40,7 +41,7 @@ async function extractExe(installer: string, tmp: string, innoextractArgs: strin
   const sevenZip = findSevenZip();
   if (sevenZip !== null && (await tryRun("7-Zip", [sevenZip, "x", name, `-o${tmp}`, "-y", "-bsp1"], dir))) return true;
 
-  console.error("Error: Could not extract .exe file.");
+  console.error(failure("Could not extract .exe file."));
   console.error("Ensure the following are installed and in your PATH:");
   console.error("  - innoextract (recommended): brew/apt/choco install innoextract");
   console.error("  - or 7-Zip: brew install p7zip / apt install p7zip-full / choco install 7zip");
@@ -62,7 +63,7 @@ async function extractSh(installer: string, tmp: string): Promise<boolean> {
   const sevenZip = findSevenZip();
   if (sevenZip !== null && (await tryRun("7-Zip", [sevenZip, "x", name, `-o${tmp}`, "-y"], dir))) return true;
 
-  console.error("Error: Could not extract .sh file.");
+  console.error(failure("Could not extract .sh file."));
   return false;
 }
 
@@ -75,9 +76,9 @@ async function tryRun(label: string, cmd: string[], cwd: string): Promise<boolea
   try {
     const exitCode = await Bun.spawn({ cmd, cwd, stdio: ["inherit", "inherit", "inherit"] }).exited;
     if (exitCode === 0) return true;
-    console.error(`Warning: ${label} failed: exit code ${exitCode}, see its output above`);
+    console.error(warning(`${label} failed: exit code ${exitCode}, see its output above`));
   } catch (error) {
-    console.error(`Warning: ${label} failed: ${error}`);
+    console.error(warning(`${label} failed: ${error}`));
   }
   return false;
 }

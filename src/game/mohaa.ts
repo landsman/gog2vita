@@ -3,6 +3,7 @@ import { basename, dirname, join } from "node:path";
 import { copy, findFiles } from "#lib/files";
 import type { Collected, Game } from "#game/game";
 import { INNOEXTRACT, SEVEN_ZIP } from "#lib/tools";
+import { quiet } from "#lib/style";
 
 export const mohaa: Game = {
   installer: "setup_medal_of_honor",
@@ -37,13 +38,13 @@ async function collect(sourceDir: string, outputDir: string): Promise<Collected>
 
   const copied: string[] = [];
   for (const pak of findFiles(mainDir, "*.pk3")) {
-    console.log(`  copying ${basename(pak)}`);
+    console.log(quiet(`  copying ${basename(pak)}`));
     copy(pak, join(outputDir, basename(pak)));
     copied.push(basename(pak));
   }
   for (const name of ["sound", "music", "video"]) {
     if (!existsSync(join(mainDir, name))) continue;
-    console.log(`  copying ${name}/`);
+    console.log(quiet(`  copying ${name}/`));
     copy(join(mainDir, name), join(outputDir, name));
     copied.push(`${name}/`);
   }

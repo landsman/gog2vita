@@ -1,6 +1,7 @@
 import { renameSync } from "node:fs";
 import { join } from "node:path";
 import type { Game } from "#game/game";
+import { step, warning } from "#lib/style";
 
 /** Download the newest VPK next to the data folder. A failure only warns: the game data is already done. */
 export async function downloadVpk(game: Game, outputParent: string): Promise<string | undefined> {
@@ -12,10 +13,10 @@ export async function downloadVpk(game: Game, outputParent: string): Promise<str
     if (!api.ok) throw new Error(`HTTP ${api.status}`);
     const found = newestVpk(await api.json(), game.vpk);
     if (found === undefined) {
-      console.error(`Warning: no release ships ${game.vpk}; get it from ${page}`);
+      console.error(warning(`no release ships ${game.vpk}; get it from ${page}`));
       return undefined;
     }
-    console.log(`Downloading ${game.vpk} ${found.tag}...`);
+    console.log(step(`Downloading ${game.vpk} ${found.tag}`));
     const response = await fetch(found.url);
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     const part = join(outputParent, `${game.vpk}.part`);
@@ -24,7 +25,9 @@ export async function downloadVpk(game: Game, outputParent: string): Promise<str
     return found.tag;
   } catch (error) {
     console.error(
-      `Warning: could not download ${game.vpk} (${error instanceof Error ? error.message : error}); get it from ${page}`,
+      warning(
+        `could not download ${game.vpk} (${error instanceof Error ? error.message : error}); get it from ${page}`,
+      ),
     );
     return undefined;
   }

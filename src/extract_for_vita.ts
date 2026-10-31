@@ -1,12 +1,13 @@
 #!/usr/bin/env bun
 import { existsSync, mkdtempSync, realpathSync, rmSync } from "node:fs";
 import { homedir, tmpdir } from "node:os";
-import { basename, dirname, join } from "node:path";
+import { basename, join, relative } from "node:path";
 import type { Game } from "#game/game";
 import { GAMES, chooseGame, detectGame } from "#game/index";
 import { pickInstaller } from "#lib/pick_installer";
 import { unpack } from "#lib/unpack";
 import { downloadVpk } from "#lib/vpk";
+import { accent, done, failure, quiet, step, success, title, warning } from "#lib/style";
 
 const ROOT = join(import.meta.dir, "..");
 
@@ -16,7 +17,7 @@ if (import.meta.main) {
     // the open line reader on stdin would otherwise keep a terminal run alive
     process.exit(0);
   } catch (error) {
-    console.error(`\nError: ${error instanceof Error ? error.message : error}`);
+    console.error(`\n${failure(error instanceof Error ? error.message : String(error))}`);
     process.exit(1);
   }
 }
@@ -39,46 +40,45 @@ async function main(args: string[]): Promise<void> {
   const outputParent = join(ROOT, game.out);
   const outputData = join(outputParent, game.data);
 
-  console.log(`Extracting GOG installer: ${basename(installer)} (${game.title})`);
-  console.log(`Working directory: ${dirname(installer)}`);
-  console.log(`Output will be: ${outputData}\n`);
+  console.log(`\n${title(game.title)} ${quiet(`for ${game.port}`)}`);
+  console.log(`  ${quiet("From")}  ${accent(shortPath(installer))}`);
+  console.log(`  ${quiet("To")}    ${accent(shortPath(outputData))}\n`);
 
   const tmp = mkdtempSync(join(tmpdir(), "gog2vita-"));
   try {
     const source = await unpack(installer, tmp, game);
-    console.log(`Extraction complete! Collecting ${game.port} game files...`);
+    console.log(step(`Collecting the ${game.port} game files`));
     const { copied, missing } = await game.collect(source, outputData);
 
-    console.log("\n=== Extraction Summary ===");
-    if (copied.length > 0) {
-      console.log("Copied files/directories:");
-      for (const item of [...new Set(copied)].sort()) console.log(`  - ${item}`);
-    }
     if (missing.length > 0) {
-      console.log("\nWarning: Missing required files:");
+      console.error(warning("Missing required files:"));
       for (const item of missing) console.log(`  - ${item}`);
       throw new Error(
         "Your installation may be incomplete. Verify your GOG download is intact. Nothing was written to the output folder.",
       );
     }
+    const items = [...new Set(copied)].sort();
+    console.log(done(`Copied ${items.length} items ${quiet(items.join(" · "))}`));
   } finally {
     rmSync(tmp, { recursive: true, force: true });
   }
 
-  console.log("\nAll required files were found!\n");
   const tag = await downloadVpk(game, outputParent);
 
-  console.log("\n=== READY FOR PS VITA ===");
-  console.log(`Game data prepared at: ${outputParent}\n`);
-  console.log("Transfer steps:");
+  console.log(`\n${success("Ready for the PS Vita")}\n`);
   console.log(
     tag !== undefined
-      ? `1. Install ${game.out}/${game.vpk} (${tag}) with VitaShell`
-      : `1. Install ${game.vpk} from https://github.com/${game.repo}/releases with VitaShell`,
+      ? `  ${accent("1")}  Install ${accent(`${game.out}/${game.vpk}`)} ${quiet(tag)} with VitaShell`
+      : `  ${accent("1")}  Install ${game.vpk} from ${accent(`https://github.com/${game.repo}/releases`)} with VitaShell`,
   );
-  console.log(`2. Copy the contents of '${game.out}/${game.data}/' so they end up in`);
-  console.log(`   ${game.vitaPath} (create the folder if needed)`);
-  if (game.note !== "") console.log(`\n${game.note}`);
+  console.log(`  ${accent("2")}  Copy ${accent(`${game.out}/${game.data}/`)} to ${accent(game.vitaPath)}`);
+  if (game.note !== "") console.error(`\n${warning(game.note)}`);
+}
+
+/** Relative to the repo when inside it, since the full path repeats on every line. */
+function shortPath(path: string): string {
+  const inRepo = relative(ROOT, path);
+  return inRepo.startsWith("..") ? path : inRepo;
 }
 
 function printUsage(): void {

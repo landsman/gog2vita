@@ -3,6 +3,7 @@ import { basename, join } from "node:path";
 import { copy, findFiles } from "#lib/files";
 import type { Collected, Game } from "#game/game";
 import { INNOEXTRACT, SEVEN_ZIP } from "#lib/tools";
+import { quiet } from "#lib/style";
 
 export const diablo: Game = {
   installer: "setup_diablo",
@@ -40,7 +41,7 @@ async function collect(sourceDir: string, outputDir: string): Promise<Collected>
   const copied = MPQS.flatMap((name) => {
     const file = found.get(name);
     if (file === undefined) return [];
-    console.log(`  copying ${basename(file)}`);
+    console.log(quiet(`  copying ${basename(file)}`));
     copy(file, join(outputDir, basename(file)));
     return [basename(file)];
   });
