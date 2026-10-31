@@ -3,6 +3,7 @@
   "private": true,
   "type": "module",
   "imports": {
+    "#src/*": "./src/*.ts",
     "#game/*": "./src/game/*.ts",
     "#lib/*": "./src/lib/*.ts"
   },

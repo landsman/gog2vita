@@ -1,7 +1,7 @@
 import { mkdirSync, rmSync } from "node:fs";
 import { basename, join } from "node:path";
 import { copy, findFiles } from "#lib/files";
-import type { Collected, Game } from "./game";
+import type { Collected, Game } from "#game/game";
 
 export const diablo: Game = {
   installer: "setup_diablo",

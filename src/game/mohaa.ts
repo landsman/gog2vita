@@ -1,7 +1,7 @@
 import { existsSync, mkdirSync, rmSync } from "node:fs";
 import { basename, dirname, join } from "node:path";
 import { copy, findFiles } from "#lib/files";
-import type { Collected, Game } from "./game";
+import type { Collected, Game } from "#game/game";
 
 export const mohaa: Game = {
   installer: "setup_medal_of_honor",

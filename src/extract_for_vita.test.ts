@@ -16,7 +16,7 @@ mock.module("#lib/ask", () => {
   };
 });
 
-const { detectGame, newestVpk, pickInstaller } = await import("./extract_for_vita");
+const { detectGame, newestVpk, pickInstaller } = await import("#src/extract_for_vita");
 const { GAMES } = await import("#game/index");
 
 function touch(path: string, text = ""): void {

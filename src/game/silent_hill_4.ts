@@ -4,7 +4,7 @@ import { dirname, join } from "node:path";
 import { match, P } from "ts-pattern";
 import { ask } from "#lib/ask";
 import { findFiles } from "#lib/files";
-import type { Collected, Game } from "./game";
+import type { Collected, Game } from "#game/game";
 
 const EXE = "SILENT HILL 4.exe";
 const REPO = "vallfrr/sh4vita";
