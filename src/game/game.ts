@@ -1,3 +1,5 @@
+import type { Tool } from "#lib/tools";
+
 /**
  * What every game module exports. Something only some games need goes here as an
  * optional field, read in one place with its default, so the other games stay untouched.
@@ -17,6 +19,8 @@ export interface Game {
   repo: string;
   vpk: string;
   note: string;
+  /** What unpacking its .exe installer needs: one tool of each inner list. */
+  tools: Tool[][];
   /** With anything required missing it returns no copied files and leaves outputDir alone. */
   collect(sourceDir: string, outputDir: string): Promise<Collected>;
 

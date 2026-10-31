@@ -1,10 +1,10 @@
+import { touch } from "#lib/test_answers";
 import { afterEach, beforeEach, expect, mock, spyOn, test } from "bun:test";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import type { Game } from "#game/game";
 import { GAMES } from "#game/index";
-import { touch } from "#lib/test_answers";
 import { unpack } from "#lib/unpack";
 
 const game = GAMES[0] as Game;
@@ -28,6 +28,12 @@ function tools(exitCodes: Record<string, number>) {
   })) as unknown as typeof Bun.spawn);
   return () => spawn.mock.calls.map((call) => (call[0] as unknown as { cmd: string[] }).cmd);
 }
+
+test("a folder needs no tools", async () => {
+  tools({});
+
+  expect(await unpack(dir, TMP, game)).toBe(dir);
+});
 
 test("a folder is used as it is", async () => {
   const commands = tools({ innoextract: 0 });
@@ -59,7 +65,7 @@ test("no tool that works stops the run", async () => {
   touch(installer);
   tools({});
 
-  await expect(unpack(installer, TMP, game)).rejects.toThrow("Extraction failed");
+  await expect(unpack(installer, TMP, game)).rejects.toThrow("Install innoextract and run this again.");
 });
 
 test("the .bin parts are found despite the parentheses in a GOG name", async () => {

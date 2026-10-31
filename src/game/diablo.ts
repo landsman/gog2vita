@@ -2,6 +2,7 @@ import { mkdirSync, rmSync } from "node:fs";
 import { basename, join } from "node:path";
 import { copy, findFiles } from "#lib/files";
 import type { Collected, Game } from "#game/game";
+import { INNOEXTRACT, SEVEN_ZIP } from "#lib/tools";
 
 export const diablo: Game = {
   installer: "setup_diablo",
@@ -16,6 +17,7 @@ export const diablo: Game = {
   repo: "diasurgical/devilutionX",
   vpk: "devilutionx-vita.vpk",
   note: "",
+  tools: [[INNOEXTRACT, SEVEN_ZIP]],
   collect,
 };
 

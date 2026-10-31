@@ -2,12 +2,16 @@ import { chmodSync, readdirSync, statSync } from "node:fs";
 import { basename, dirname, extname } from "node:path";
 import { match } from "ts-pattern";
 import type { Game } from "#game/game";
+import { ensureTools, SEVEN_ZIP } from "#lib/tools";
 
 /** The folder to collect from: the given one as it is, or an installer unpacked into tmp. */
 export async function unpack(installer: string, tmp: string, game: Game): Promise<string> {
   if (statSync(installer).isDirectory()) return installer;
   const unpacked = await match(extname(installer).toLowerCase())
-    .with(".exe", () => extractExe(installer, tmp, game.innoextractArgs ?? []))
+    .with(".exe", async () => {
+      await ensureTools(game.tools);
+      return extractExe(installer, tmp, game.innoextractArgs ?? []);
+    })
     .with(".sh", () => extractSh(installer, tmp))
     .otherwise((ext) => {
       throw new Error(`Unsupported installer type: ${ext}`);
@@ -63,7 +67,7 @@ async function extractSh(installer: string, tmp: string): Promise<boolean> {
 }
 
 function findSevenZip(): string | null {
-  return Bun.which("7z") ?? Bun.which("7zz") ?? Bun.which("7za");
+  return SEVEN_ZIP.commands.map((command) => Bun.which(command)).find((path) => path !== null) ?? null;
 }
 
 /** Whether the command succeeded. A failure only warns, so the caller can try the next tool. */

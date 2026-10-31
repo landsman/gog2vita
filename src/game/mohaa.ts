@@ -2,6 +2,7 @@ import { existsSync, mkdirSync, rmSync } from "node:fs";
 import { basename, dirname, join } from "node:path";
 import { copy, findFiles } from "#lib/files";
 import type { Collected, Game } from "#game/game";
+import { INNOEXTRACT, SEVEN_ZIP } from "#lib/tools";
 
 export const mohaa: Game = {
   installer: "setup_medal_of_honor",
@@ -16,6 +17,7 @@ export const mohaa: Game = {
   repo: "HenryKun55/openmohaa",
   vpk: "OpenMoHAA.vpk",
   note: "Do NOT copy configs/ or save/ folders. OpenMoHAA Vita generates those automatically.",
+  tools: [[INNOEXTRACT, SEVEN_ZIP]],
   collect,
 };
 

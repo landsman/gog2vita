@@ -33,7 +33,7 @@ You also need at least one of the following extraction tools installed and avail
 | [`7-Zip`](https://www.7-zip.org/) (`7z`)            | Fallback for multi-part installers | **macOS:** `brew install p7zip` • **Linux:** `sudo apt install p7zip-full` • **Windows:** [Download from 7-zip.org](https://www.7-zip.org/) (add to PATH) |
 | [`unzip`](https://linux.die.net/man/1/unzip)        | Linux `.sh` installers             | Usually pre-installed on most systems                                                                                                                     |
 
-On macOS and Linux, `make tools` shows which of these are installed, and `make deps` installs innoextract and 7-Zip with `brew` or `apt`.
+When an installer needs a tool you do not have, the script offers to install it with `brew`, `apt` or `choco`. Silent Hill 4 needs `innoextract` itself; 7-Zip is enough for the other games. `make tools` shows what is installed, and `make deps` installs innoextract and 7-Zip in one go.
 
 ## Usage
 

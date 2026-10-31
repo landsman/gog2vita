@@ -5,6 +5,7 @@ import { match, P } from "ts-pattern";
 import { ask } from "#lib/ask";
 import { findFiles } from "#lib/files";
 import type { Collected, Game } from "#game/game";
+import { INNOEXTRACT } from "#lib/tools";
 
 const EXE = "SILENT HILL 4.exe";
 const REPO = "vallfrr/sh4vita";
@@ -24,6 +25,7 @@ export const silentHill4: Game = {
   repo: REPO,
   vpk: "sh4vita.vpk",
   note: "Needs ur0:data/libshacccg.suprx (install it with ShaRKF00D) and about 4 GB free on ux0:.",
+  tools: [[INNOEXTRACT]],
   collect,
 };
 
