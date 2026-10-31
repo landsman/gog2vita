@@ -1,10 +1,12 @@
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 from extract_for_vita import detect_game, newest_vpk
 from src.game.diablo import collect as collect_diablo
 from src.game.mohaa import collect as collect_mohaa
+from src.game.silent_hill_4 import collect as collect_sh4
 
 
 def touch(path, text=""):
@@ -76,10 +78,50 @@ class CollectDiablo(unittest.TestCase):
         self.assertTrue((self.out / "previous.mpq").exists())
 
 
+class CollectSilentHill4(unittest.TestCase):
+    def setUp(self):
+        self.tmp = Path(tempfile.mkdtemp())
+        self.src = self.tmp / "extracted"
+        self.out = self.tmp / "sh4vita" / "sh4"
+
+    def test_missing_exe_downloads_nothing(self):
+        touch(self.src / "app" / "data" / "a.bin")
+        with mock.patch("urllib.request.urlretrieve") as download:
+            self.assertEqual(collect_sh4(self.src, self.out), ([], ["SILENT HILL 4.exe"]))
+        download.assert_not_called()
+
+    def run_preparer(self, returncode):
+        touch(self.src / "app" / "SILENT HILL 4.exe")
+        with mock.patch("platform.system", return_value="Linux"), \
+             mock.patch("platform.machine", return_value="x86_64"), \
+             mock.patch("urllib.request.urlretrieve", side_effect=lambda url, path: touch(Path(path))) as download, \
+             mock.patch("subprocess.run", return_value=mock.Mock(returncode=returncode)) as run:
+            result = collect_sh4(self.src, self.out)
+        self.assertTrue(download.call_args[0][0].endswith("/releases/latest/download/sh4prep-linux"))
+        # the preparer appends sh4/ itself, so it gets the parent, and the folder holding the exe
+        self.assertEqual(run.call_args[0][0][1:], [str(self.src / "app"), str(self.out.parent), "English"])
+        return result
+
+    def test_runs_the_preparer_on_the_folder_holding_the_exe(self):
+        self.assertEqual(self.run_preparer(0)[1], [])
+
+    def test_a_rejected_exe_stops_the_run(self):
+        with self.assertRaises(SystemExit):
+            self.run_preparer(1)
+
+    def test_a_platform_without_a_preparer_stops_the_run(self):
+        touch(self.src / "SILENT HILL 4.exe")
+        with mock.patch("platform.system", return_value="Linux"), \
+             mock.patch("platform.machine", return_value="aarch64"), self.assertRaises(SystemExit):
+            collect_sh4(self.src, self.out)
+
+
 class DetectGame(unittest.TestCase):
     def test_picks_the_profile_by_installer_name(self):
         self.assertEqual(detect_game("setup_diablo_1.09_hellfire_v4_(78466).exe")["port"], "DevilutionX")
         self.assertEqual(detect_game("setup_medal_of_honor_2.0.0.21.exe")["port"], "OpenMoHAA")
+        self.assertEqual(detect_game("setup_silent_hill_4_the_room_1.0_gog_v5_(80750).exe")["port"], "sh4vita")
+        self.assertEqual(detect_game("sh4")["port"], "sh4vita")
         self.assertIsNone(detect_game("setup_quake.exe"))
 
 
