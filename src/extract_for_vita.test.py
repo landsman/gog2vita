@@ -90,10 +90,11 @@ class CollectSilentHill4(unittest.TestCase):
             self.assertEqual(collect_sh4(self.src, self.out), ([], ["SILENT HILL 4.exe"]))
         download.assert_not_called()
 
-    def run_preparer(self, returncode):
+    def run_preparer(self, returncode, answers=("",)):
         touch(self.src / "app" / "SILENT HILL 4.exe")
         with mock.patch("platform.system", return_value="Linux"), \
              mock.patch("platform.machine", return_value="x86_64"), \
+             mock.patch("builtins.input", side_effect=answers), \
              mock.patch("urllib.request.urlretrieve", side_effect=lambda url, path: touch(Path(path))) as download, \
              mock.patch("subprocess.run", return_value=mock.Mock(returncode=returncode)) as run:
             result = collect_sh4(self.src, self.out)
@@ -104,6 +105,16 @@ class CollectSilentHill4(unittest.TestCase):
 
     def test_runs_the_preparer_on_the_folder_holding_the_exe(self):
         self.assertEqual(self.run_preparer(0)[1], [])
+
+    def test_asks_for_the_language_until_the_answer_is_one_of_them(self):
+        touch(self.src / "app" / "SILENT HILL 4.exe")
+        with mock.patch("platform.system", return_value="Linux"), \
+             mock.patch("platform.machine", return_value="x86_64"), \
+             mock.patch("builtins.input", side_effect=["9", "German", "3"]), \
+             mock.patch("urllib.request.urlretrieve", side_effect=lambda url, path: touch(Path(path))), \
+             mock.patch("subprocess.run", return_value=mock.Mock(returncode=0)) as run:
+            collect_sh4(self.src, self.out)
+        self.assertEqual(run.call_args[0][0][-1], "German")
 
     def test_a_rejected_exe_stops_the_run(self):
         with self.assertRaises(SystemExit):

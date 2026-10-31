@@ -1,4 +1,3 @@
-import os
 import platform
 import subprocess
 import sys
@@ -8,11 +7,23 @@ from pathlib import Path
 
 EXE = "SILENT HILL 4.exe"
 REPO = "vallfrr/sh4vita"
+LANGUAGES = ["English", "French", "German", "Italian", "Spanish"]
 PREPARERS = {
     ("Darwin", "arm64"): "sh4prep-macos",
     ("Linux", "x86_64"): "sh4prep-linux",
     ("Windows", "AMD64"): "sh4prep-windows.exe",
 }
+
+def ask_language():
+    """English on a plain Enter, since most runs want it."""
+    for n, language in enumerate(LANGUAGES, 1):
+        print(f"  {n}) {language}")
+    while True:
+        answer = input(f"Game language [1-{len(LANGUAGES)}, Enter for {LANGUAGES[0]}]: ").strip()
+        if not answer:
+            return LANGUAGES[0]
+        if answer.isdigit() and 1 <= int(answer) <= len(LANGUAGES):
+            return LANGUAGES[int(answer) - 1]
 
 def collect(source_dir, output_dir):
     """Run the port's own preparer, which rejects any exe but GOG v5 and writes the index the VPK checks.
@@ -27,6 +38,7 @@ def collect(source_dir, output_dir):
     if asset is None:
         sys.exit(f"Error: {REPO} ships no sh4prep for {platform.system()} {platform.machine()}; build tools/sh4prep from its source.")
 
+    language = ask_language()
     with tempfile.TemporaryDirectory() as tmp:
         preparer = Path(tmp) / asset
         print(f"Downloading {asset}...", flush=True)
@@ -38,7 +50,6 @@ def collect(source_dir, output_dir):
         preparer.chmod(0o755)
         output_dir.parent.mkdir(parents=True, exist_ok=True)
         # writes <output_dir.parent>/sh4/; a rerun skips the files already copied
-        language = os.environ.get("SH4_LANGUAGE", "English")
         result = subprocess.run([str(preparer), str(exe.parent), str(output_dir.parent), language])
     if result.returncode != 0:
         sys.exit(f"Error: sh4prep failed with exit code {result.returncode}, see its output above.")
