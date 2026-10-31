@@ -1,6 +1,5 @@
-/openmohaa/
-/diasurgical/
+/games-vita/
 __pycache__/
 # GOG installer files, never committed
-/gog/*
-!/gog/.gitkeep
+/games-gog/*
+!/games-gog/.gitkeep

@@ -12,7 +12,7 @@ A cross-platform one-command script that takes the offline installer of a game y
 | [Medal of Honor: Allied Assault](https://www.gog.com/en/game/medal_of_honor_allied_assault_war_chest) | [OpenMoHAA](https://github.com/HenryKun55/openmohaa) | `ux0:data/openmohaa/main/` | [docs/mohaa.md](docs/mohaa.md) |
 | [Diablo + Hellfire](https://www.gog.com/en/game/diablo) | [DevilutionX](https://github.com/diasurgical/devilutionX) | `ux0:data/diasurgical/devilution/` | [docs/diablo.md](docs/diablo.md) |
 
-Each game is one module in [`games/`](games/); adding a game means adding a module there and listing it in `games/__init__.py`.
+Each game is one module in [`src/game/`](src/game/); adding a game means adding a module there and listing it in `src/game/__init__.py`.
 
 ## Supported Platforms
 
@@ -34,7 +34,7 @@ On macOS and Linux, `make tools` shows which of these are installed, and `make d
 
 ## Usage
 
-Put the GOG offline installer (the `.exe` and any `-*.bin` parts) in the `gog/` folder of this repository. Git ignores everything in `gog/`, so the game files are never committed.
+Put the GOG offline installer (the `.exe` and any `-*.bin` parts) in the `games-gog/` folder of this repository. Git ignores everything in `games-gog/`, so the game files are never committed.
 
 ### macOS / Linux
 
@@ -42,7 +42,7 @@ Put the GOG offline installer (the `.exe` and any `-*.bin` parts) in the `gog/` 
 make extract
 ```
 
-- One installer in `gog/`: it is used.
+- One installer in `games-gog/`: it is used.
 - Several: the script lists them and asks which one.
 - None: it asks which game you want, whether you already own it on GOG, prints a clickable link to the store page or the download, and then waits for you to drag the `.exe` into the terminal.
 
@@ -51,11 +51,11 @@ To use an installer somewhere else, pass it directly: `make extract INSTALLER="$
 ### Windows (Command Prompt/PowerShell)
 
 ```powershell
-python scripts\extract_for_vita.py
-python scripts\extract_for_vita.py "gog\setup_diablo_1.09_hellfire_v4_(78466).exe"
+python src\extract_for_vita.py
+python src\extract_for_vita.py "games-gog\setup_diablo_1.09_hellfire_v4_(78466).exe"
 ```
 
-The game is recognised by the installer's file name; if the name is not one the script knows, it asks which game it is. The output lands in this repository laid out the way `ux0:data/` expects it — `openmohaa/main/` or `diasurgical/devilution/` — and the game's guide says where it goes on the Vita.
+The game is recognised by the installer's file name; if the name is not one the script knows, it asks which game it is. The output lands in `games-vita/` in this repository, one folder per port — `openmohaa/main/` or `diasurgical/devilution/` — laid out the way `ux0:data/` expects it, and the game's guide says where it goes on the Vita.
 
 ## Troubleshooting
 

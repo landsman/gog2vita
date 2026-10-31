@@ -5,6 +5,6 @@ copies the game data out of the extracted installer.
 collect(source_dir, output_dir) returns (copied, missing). When anything
 required is missing it returns ([], missing) and leaves output_dir alone.
 """
-from games import diablo, mohaa
+from src.game import diablo, mohaa
 
 GAMES = [mohaa.GAME, diablo.GAME]

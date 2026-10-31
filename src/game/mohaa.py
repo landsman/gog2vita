@@ -49,7 +49,7 @@ GAME = {
     # several parts (.exe + .bin), so the library page rather than one direct link
     "download": "https://www.gog.com/en/account",
     "port": "OpenMoHAA",
-    "out": "openmohaa",
+    "out": "games-vita/openmohaa",
     "data": "main",
     "vita_path": "ux0:data/openmohaa/main/",
     "repo": "HenryKun55/openmohaa",

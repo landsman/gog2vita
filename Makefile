@@ -1,6 +1,6 @@
 .DEFAULT_GOAL := help
 PYTHON ?= python3
-SCRIPT := scripts/extract_for_vita.py
+SCRIPT := src/extract_for_vita.py
 INSTALLER ?=
 
 .PHONY: help
@@ -11,12 +11,12 @@ help: ## show this help
 
 ##@ Extraction
 .PHONY: extract
-extract: ## extract game data, asks which installer in gog/ when there are several
+extract: ## extract game data, asks which installer in games-gog/ when there are several
 	$(PYTHON) $(SCRIPT) $(if $(INSTALLER),"$(INSTALLER)")
 
 .PHONY: clean
 clean: ## delete the extracted game data
-	rm -rf openmohaa diasurgical
+	rm -rf games-vita
 
 ##@ Setup
 .PHONY: tools
@@ -30,8 +30,8 @@ deps: ## install innoextract and 7-Zip with brew or apt
 ##@ Quality assurance
 .PHONY: lint
 lint: ## check the scripts compile
-	$(PYTHON) -m py_compile scripts/*.py games/*.py
+	$(PYTHON) -m py_compile src/*.py src/game/*.py
 
 .PHONY: test
 test: ## run the tests against a fake installer layout
-	@for t in scripts/*.test.py; do PYTHONDONTWRITEBYTECODE=1 $(PYTHON) $$t -v || exit 1; done
+	@for t in src/*.test.py; do PYTHONDONTWRITEBYTECODE=1 $(PYTHON) $$t -v || exit 1; done

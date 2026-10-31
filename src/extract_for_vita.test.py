@@ -3,8 +3,8 @@ import unittest
 from pathlib import Path
 
 from extract_for_vita import detect_game, newest_vpk
-from games.diablo import collect as collect_diablo
-from games.mohaa import collect as collect_mohaa
+from src.game.diablo import collect as collect_diablo
+from src.game.mohaa import collect as collect_mohaa
 
 
 def touch(path, text=""):
