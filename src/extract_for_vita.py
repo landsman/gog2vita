@@ -11,9 +11,9 @@ import urllib.request
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-sys.path.insert(0, str(ROOT))  # games/ sits at the repo root
+sys.path.insert(0, str(ROOT))  # so the src.game import resolves when run as a script
 
-from games import GAMES
+from src.game import GAMES
 
 def find_tool(command_names):
     """Find an executable tool from a list of possible command names."""
@@ -22,7 +22,7 @@ def find_tool(command_names):
             return cmd
     return None
 
-def extract_exe(installer_path, temp_dir):
+def extract_exe(installer_path, temp_dir, innoextract_args=()):
     """Extract a Windows .exe installer (InnoSetup), supporting multi-part .bin files."""
     exe_dir = installer_path.parent
     exe_name = installer_path.name
@@ -42,7 +42,7 @@ def extract_exe(installer_path, temp_dir):
     if innoextract:
         try:
             subprocess.run(
-                [innoextract, exe_name, "-d", str(temp_dir)],
+                [innoextract, *innoextract_args, exe_name, "-d", str(temp_dir)],
                 check=True,
                 cwd=exe_dir
             )
@@ -123,10 +123,10 @@ def extract_sh(installer_path, temp_dir):
     return False
 
 def detect_game(installer_name):
-    """The game whose installer name prefix matches, or None."""
+    """The game whose installer name prefix or game folder name matches, or None."""
     name = installer_name.lower()
     for game in GAMES:
-        if name.startswith(game["installer"]):
+        if name.startswith(game["installer"]) or name == game.get("folder"):
             return game
     return None
 
@@ -175,12 +175,12 @@ def link(url):
     return f"\033]8;;{url}\033\\{url}\033]8;;\033\\" if sys.stdout.isatty() else url
 
 def pick_installer(gog_dir):
-    """(installer, game or None) from gog/, asking which one when there are several.
+    """(installer, game or None) from games-gog/, asking which one when there are several.
 
-    With an empty gog/ it asks which game, points at its GOG page and waits
+    With an empty games-gog/ it asks which game, points at its GOG page and waits
     for the installer to be dragged in.
     """
-    found = sorted(gog_dir.glob("setup_*.exe")) + sorted(gog_dir.glob("*.sh"))
+    found = sorted(gog_dir.glob("setup_*.exe")) + sorted(gog_dir.glob("*.sh")) + sorted(d for d in gog_dir.iterdir() if d.is_dir())
     if len(found) == 1:
         return found[0], None
     if found:
@@ -198,7 +198,7 @@ def pick_installer(gog_dir):
     print(f"Put the .exe and its .bin files in {gog_dir}, or drag the .exe here.")
     print()
     # read the way a terminal pastes a dragged-in file: quoted or with backslash escapes
-    answer = input("Path to the setup_*.exe (Enter to look in gog/ again): ").strip().strip("'\"")
+    answer = input("Path to the setup_*.exe (Enter to look in games-gog/ again): ").strip().strip("'\"")
     if answer:
         return Path(answer.replace("\\ ", " ").replace("\\(", "(").replace("\\)", ")")), game
     found = sorted(gog_dir.glob(f"{game['installer']}*.exe"))
@@ -206,8 +206,8 @@ def pick_installer(gog_dir):
 
 def main():
     if len(sys.argv) > 2 or sys.argv[1:] in (["-h"], ["--help"]):
-        print("Usage: python3 scripts/extract_for_vita.py [path_to_gog_installer.exe]")
-        print("\nWithout a path it takes the installer from gog/, asking which one if there are several.")
+        print("Usage: python3 src/extract_for_vita.py [path_to_gog_installer.exe or installed_game_folder]")
+        print("\nWithout a path it takes the installer from games-gog/, asking which one if there are several.")
         print("\nSupported games:")
         for game in GAMES:
             print(f"  {game['installer']}*  {game['title']} for {game['port']}")
@@ -217,7 +217,7 @@ def main():
     if len(sys.argv) == 2:
         installer_path, game = Path(sys.argv[1]), None
     else:
-        installer_path, game = pick_installer(ROOT / "gog")
+        installer_path, game = pick_installer(ROOT / "games-gog")
     if installer_path is None:
         print("Error: no installer given", file=sys.stderr)
         sys.exit(1)
@@ -245,8 +245,11 @@ def main():
         success = False
 
         ext = installer_path.suffix.lower()
-        if ext == ".exe":
-            success = extract_exe(installer_path, temp_dir)
+        if installer_path.is_dir():
+            # already installed or extracted, nothing to unpack
+            temp_dir, success = installer_path, True
+        elif ext == ".exe":
+            success = extract_exe(installer_path, temp_dir, game.get("innoextract", ()))
         elif ext == ".sh":
             success = extract_sh(installer_path, temp_dir)
         else:

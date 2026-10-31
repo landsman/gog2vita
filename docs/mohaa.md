@@ -8,17 +8,17 @@ GOG ships it as a multi-part installer (`.exe` + `-*.bin` files); the extractor 
 
 ### 1. Download your GOG installer files
 
-From your GOG account, download the offline backup installer for *[Medal of Honor: Allied Assault](https://www.gog.com/en/account)* and put the files in the `gog/` folder of this repository. For recent versions, that looks like this:
+From your GOG account, download the offline backup installer for *[Medal of Honor: Allied Assault](https://www.gog.com/en/account)* and put the files in the `games-gog/` folder of this repository. For recent versions, that looks like this:
 
 ```text
-gog/
+games-gog/
 ├── setup_medal_of_honor_2.0.0.21.exe
 ├── setup_medal_of_honor_2.0.0.21-1.bin
 └── setup_medal_of_honor_2.0.0.21-2.bin
 ```
 
 > [!IMPORTANT]
-> Keep the `.exe` and **all** matching `-*.bin` files together, and only one installer version in `gog/` at a time. Git ignores everything in `gog/`, so the game files are never committed.
+> Keep the `.exe` and **all** matching `-*.bin` files together, and only one installer version in `games-gog/` at a time. Git ignores everything in `games-gog/`, so the game files are never committed.
 
 ### 2. Run the extractor
 
@@ -31,14 +31,14 @@ These steps follow the port's [install guide](https://github.com/HenryKun55/open
 After extraction completes, you'll find a new folder in this repository:
 
 ```text
-openmohaa/
+games-vita/openmohaa/
 ├── OpenMoHAA.vpk   ← the newest release of the port, downloaded on every run
 └── main/           ← the game data, laid out like ux0:data/openmohaa/main/ on the Vita
 ```
 
 1. The script downloads `OpenMoHAA.vpk` from the newest [release of the port](https://github.com/HenryKun55/openmohaa/releases), so a run always brings the current version; installing it over an older one keeps settings and saves. If the download fails, it says so and the game data is still complete; get the VPK from that page yourself.
-2. Install `openmohaa/OpenMoHAA.vpk` with [VitaShell](https://github.com/TheOfficialFloW/VitaShell).
-3. In VitaShell, connect over USB or FTP and copy the extracted `openmohaa/main/` folder so it ends up as:
+2. Install `games-vita/openmohaa/OpenMoHAA.vpk` with [VitaShell](https://github.com/TheOfficialFloW/VitaShell).
+3. In VitaShell, connect over USB or FTP and copy the extracted `games-vita/openmohaa/main/` folder so it ends up as:
 
    ```text
    ux0:data/openmohaa/main/
