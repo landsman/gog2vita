@@ -174,21 +174,27 @@ def link(url):
     """A URL the terminal makes clickable; OSC 8 for the ones that do not detect bare URLs."""
     return f"\033]8;;{url}\033\\{url}\033]8;;\033\\" if sys.stdout.isatty() else url
 
-def pick_installer(gog_dir):
-    """(installer, game or None) from games-gog/, asking which one when there are several.
-
-    With an empty games-gog/ it asks which game, points at its GOG page and waits
-    for the installer to be dragged in.
-    """
+def installers_for(game, gog_dir):
+    """What in gog_dir can be this game: named for it, or a name no game claims."""
     found = sorted(gog_dir.glob("setup_*.exe")) + sorted(gog_dir.glob("*.sh")) + sorted(d for d in gog_dir.iterdir() if d.is_dir())
+    return [f for f in found if detect_game(f.name) in (game, None)]
+
+def pick_installer(gog_dir):
+    """(installer, game) after asking which game, and which installer when it has several.
+
+    With nothing for that game in games-gog/ it points at its GOG page and
+    waits for the installer to be dragged in.
+    """
+    print("Which game do you want on the Vita?")
+    game = GAMES[choose("Game", [f"{g['title']} for {g['port']}" for g in GAMES])]
+    found = installers_for(game, gog_dir)
     if len(found) == 1:
-        return found[0], None
+        return found[0], game
     if found:
         print(f"Installers in {gog_dir}:")
-        return found[choose("Which one", [f.name for f in found])], None
+        return found[choose("Which one", [f.name for f in found])], game
 
-    print(f"No installer in {gog_dir}. Which game do you want on the Vita?")
-    game = GAMES[choose("Game", [f"{g['title']} for {g['port']}" for g in GAMES])]
+    print(f"Nothing for it in {gog_dir}.")
     print()
     if input("Do you already own it on GOG? [y/N]: ").strip().lower().startswith("y"):
         print(f"Download the offline installer (signed in):  {link(game['download'])}")
@@ -201,13 +207,13 @@ def pick_installer(gog_dir):
     answer = input("Path to the setup_*.exe (Enter to look in games-gog/ again): ").strip().strip("'\"")
     if answer:
         return Path(answer.replace("\\ ", " ").replace("\\(", "(").replace("\\)", ")")), game
-    found = sorted(gog_dir.glob(f"{game['installer']}*.exe"))
+    found = installers_for(game, gog_dir)
     return (found[0] if found else None), game
 
 def main():
     if len(sys.argv) > 2 or sys.argv[1:] in (["-h"], ["--help"]):
         print("Usage: python3 src/extract_for_vita.py [path_to_gog_installer.exe or installed_game_folder]")
-        print("\nWithout a path it takes the installer from games-gog/, asking which one if there are several.")
+        print("\nWithout a path it asks which game, then takes its installer from games-gog/.")
         print("\nSupported games:")
         for game in GAMES:
             print(f"  {game['installer']}*  {game['title']} for {game['port']}")

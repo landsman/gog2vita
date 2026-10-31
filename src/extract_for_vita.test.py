@@ -3,7 +3,7 @@ import unittest
 from pathlib import Path
 from unittest import mock
 
-from extract_for_vita import detect_game, newest_vpk
+from extract_for_vita import detect_game, newest_vpk, pick_installer
 from src.game.diablo import collect as collect_diablo
 from src.game.mohaa import collect as collect_mohaa
 from src.game.silent_hill_4 import collect as collect_sh4
@@ -134,6 +134,20 @@ class DetectGame(unittest.TestCase):
         self.assertEqual(detect_game("setup_silent_hill_4_the_room_1.0_gog_v5_(80750).exe")["port"], "sh4vita")
         self.assertEqual(detect_game("sh4")["port"], "sh4vita")
         self.assertIsNone(detect_game("setup_quake.exe"))
+
+
+class PickInstaller(unittest.TestCase):
+    def test_asks_the_game_even_with_one_installer_and_ignores_other_games(self):
+        gog = Path(tempfile.mkdtemp())
+        (gog / "sh4").mkdir()
+        touch(gog / "setup_diablo_1.09.exe")
+        diablo, sh4 = 2, 3
+        with mock.patch("builtins.input", side_effect=[str(sh4)]):
+            installer, game = pick_installer(gog)
+        self.assertEqual((installer.name, game["port"]), ("sh4", "sh4vita"))
+        with mock.patch("builtins.input", side_effect=[str(diablo)]):
+            installer, game = pick_installer(gog)
+        self.assertEqual((installer.name, game["port"]), ("setup_diablo_1.09.exe", "DevilutionX"))
 
 
 class NewestVpk(unittest.TestCase):
