@@ -3,7 +3,7 @@ import unittest
 from pathlib import Path
 from unittest import mock
 
-from extract_for_vita import detect_game, newest_vpk
+from extract_for_vita import detect_game, newest_vpk, pick_installer
 from src.game.diablo import collect as collect_diablo
 from src.game.mohaa import collect as collect_mohaa
 from src.game.silent_hill_4 import collect as collect_sh4
@@ -90,10 +90,11 @@ class CollectSilentHill4(unittest.TestCase):
             self.assertEqual(collect_sh4(self.src, self.out), ([], ["SILENT HILL 4.exe"]))
         download.assert_not_called()
 
-    def run_preparer(self, returncode):
+    def run_preparer(self, returncode, answers=("",)):
         touch(self.src / "app" / "SILENT HILL 4.exe")
         with mock.patch("platform.system", return_value="Linux"), \
              mock.patch("platform.machine", return_value="x86_64"), \
+             mock.patch("builtins.input", side_effect=answers), \
              mock.patch("urllib.request.urlretrieve", side_effect=lambda url, path: touch(Path(path))) as download, \
              mock.patch("subprocess.run", return_value=mock.Mock(returncode=returncode)) as run:
             result = collect_sh4(self.src, self.out)
@@ -104,6 +105,16 @@ class CollectSilentHill4(unittest.TestCase):
 
     def test_runs_the_preparer_on_the_folder_holding_the_exe(self):
         self.assertEqual(self.run_preparer(0)[1], [])
+
+    def test_asks_for_the_language_until_the_answer_is_one_of_them(self):
+        touch(self.src / "app" / "SILENT HILL 4.exe")
+        with mock.patch("platform.system", return_value="Linux"), \
+             mock.patch("platform.machine", return_value="x86_64"), \
+             mock.patch("builtins.input", side_effect=["9", "German", "3"]), \
+             mock.patch("urllib.request.urlretrieve", side_effect=lambda url, path: touch(Path(path))), \
+             mock.patch("subprocess.run", return_value=mock.Mock(returncode=0)) as run:
+            collect_sh4(self.src, self.out)
+        self.assertEqual(run.call_args[0][0][-1], "German")
 
     def test_a_rejected_exe_stops_the_run(self):
         with self.assertRaises(SystemExit):
@@ -123,6 +134,20 @@ class DetectGame(unittest.TestCase):
         self.assertEqual(detect_game("setup_silent_hill_4_the_room_1.0_gog_v5_(80750).exe")["port"], "sh4vita")
         self.assertEqual(detect_game("sh4")["port"], "sh4vita")
         self.assertIsNone(detect_game("setup_quake.exe"))
+
+
+class PickInstaller(unittest.TestCase):
+    def test_asks_the_game_even_with_one_installer_and_ignores_other_games(self):
+        gog = Path(tempfile.mkdtemp())
+        (gog / "sh4").mkdir()
+        touch(gog / "setup_diablo_1.09.exe")
+        diablo, sh4 = 2, 3
+        with mock.patch("builtins.input", side_effect=[str(sh4)]):
+            installer, game = pick_installer(gog)
+        self.assertEqual((installer.name, game["port"]), ("sh4", "sh4vita"))
+        with mock.patch("builtins.input", side_effect=[str(diablo)]):
+            installer, game = pick_installer(gog)
+        self.assertEqual((installer.name, game["port"]), ("setup_diablo_1.09.exe", "DevilutionX"))
 
 
 class NewestVpk(unittest.TestCase):

@@ -43,9 +43,11 @@ Put the GOG offline installer (the `.exe` and any `-*.bin` parts), or a folder w
 make extract
 ```
 
-- One installer in `games-gog/`: it is used.
+It asks which game you want, then:
+
+- One installer for it in `games-gog/`: it is used.
 - Several: the script lists them and asks which one.
-- None: it asks which game you want, whether you already own it on GOG, prints a clickable link to the store page or the download, and then waits for you to drag the `.exe` into the terminal.
+- None: it asks whether you already own it on GOG, prints a clickable link to the store page or the download, and then waits for you to drag the `.exe` into the terminal.
 
 To use an installer somewhere else, pass it directly: `make extract INSTALLER="$HOME/Downloads/setup_diablo_1.09_hellfire_v4_(78466).exe"` (quoted, because of the parentheses). Run `make` on its own to list the other targets.
 
