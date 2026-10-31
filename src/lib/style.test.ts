@@ -14,7 +14,7 @@ async function printed(env: Record<string, string>) {
 }
 
 test("colours when forced, the way a terminal gets them", async () => {
-  expect(await printed({ FORCE_COLOR: "1" })).toContain("\x1b[32mok");
+  expect(await printed({ FORCE_COLOR: "1" })).toContain("\x1b[92mok");
 });
 
 test("NO_COLOR and a pipe get plain text, so a log stays readable", async () => {

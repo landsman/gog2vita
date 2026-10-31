@@ -11,7 +11,7 @@ help: ## show this help
 ##@ Extraction
 .PHONY: extract
 extract: node_modules ## extract game data, asks which installer in games-gog/ when there are several
-	bun $(SCRIPT) $(if $(INSTALLER),"$(INSTALLER)")
+	@bun $(SCRIPT) $(if $(INSTALLER),"$(INSTALLER)")
 
 .PHONY: clean
 clean: ## delete the extracted game data
@@ -19,7 +19,7 @@ clean: ## delete the extracted game data
 
 ##@ Setup
 node_modules: package.json bun.lock
-	bun install --frozen-lockfile
+	@bun install --frozen-lockfile --silent
 	@touch node_modules
 
 .PHONY: tools

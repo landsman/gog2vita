@@ -1,4 +1,5 @@
 import { choose } from "#lib/ask";
+import { quiet } from "#lib/style";
 import type { Game } from "#game/game";
 import { diablo } from "#game/diablo";
 import { mohaa } from "#game/mohaa";
@@ -15,7 +16,7 @@ export function detectGame(installerName: string): Game | undefined {
 export async function chooseGame(): Promise<Game> {
   const index = await choose(
     "Game",
-    GAMES.map((g) => `${g.title} for ${g.port}`),
+    GAMES.map((g) => `${g.title} ${quiet(`for ${g.port}`)}`),
   );
   const game = GAMES[index];
   if (game === undefined) throw new Error(`choose returned ${index}, outside the list it was given`);

@@ -5,18 +5,18 @@ import type { Game } from "#game/game";
 import { chooseGame, detectGame } from "#game/index";
 import { ask, choose } from "#lib/ask";
 import { findFiles } from "#lib/files";
-import { accent, heading } from "#lib/style";
+import { accent, step } from "#lib/style";
 
 /** The installer and its game after asking which game, and which installer when it has several. */
 export async function pickInstaller(gogDir: string): Promise<Picked> {
-  console.log(heading("Which game do you want on the Vita?"));
+  console.log(step("Which game do you want on the Vita?"));
   const game = await chooseGame();
   const found = installersFor(game, gogDir);
   return match(found)
     .with([], () => askForInstaller(game, gogDir))
     .with([P.string], ([only]) => ({ installer: only, game }))
     .otherwise(async () => {
-      console.log(heading(`Installers in ${gogDir}:`));
+      console.log(step(`Installers in ${gogDir}:`));
       const index = await choose(
         "Which one",
         found.map((f) => basename(f)),

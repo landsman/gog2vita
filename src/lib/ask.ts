@@ -1,4 +1,4 @@
-import { accent, question as styleQuestion } from "#lib/style";
+import { accent, question as styleQuestion, quiet } from "#lib/style";
 
 const lines = console[Symbol.asyncIterator]();
 
@@ -12,10 +12,11 @@ export async function ask(question: string): Promise<string> {
 
 /** Ask for one of labels by number; returns its index. */
 export async function choose(question: string, labels: string[]): Promise<number> {
-  labels.forEach((label, n) => console.log(`  ${accent(String(n + 1))}) ${label}`));
+  labels.forEach((label, n) => console.log(`  ${accent(String(n + 1))}  ${label}`));
   while (true) {
     const answer = await ask(`${question} [1-${labels.length}]:`);
     const index = /^\d+$/.test(answer) ? Number(answer) - 1 : -1;
     if (index >= 0 && index < labels.length) return index;
+    console.log(quiet(`Pick a number from 1 to ${labels.length}.`));
   }
 }
