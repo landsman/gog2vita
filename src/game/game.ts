@@ -27,6 +27,8 @@ export interface Game {
   /** Name of a folder holding the installed game, when one is recognised. */
   folder?: string;
   innoextractArgs?: string[];
+  /** Its Steam store page, for a port that takes the Steam copy instead of a GOG installer. */
+  steam?: string;
 }
 
 export interface Collected {

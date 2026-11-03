@@ -14,6 +14,7 @@ export const hollowKnight: Game = {
   installer: "hollowknightvitapatch",
   title: "Hollow Knight",
   gog: "https://www.gog.com/en/game/hollow_knight",
+  steam: "https://store.steampowered.com/app/367520/Hollow_Knight/",
   download: `https://github.com/${REPO}/releases`,
   port: "Hollow Knight Vita",
   out: "games-vita/hollowknight",
