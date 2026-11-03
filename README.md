@@ -33,8 +33,9 @@ You also need at least one of the following extraction tools installed and avail
 | [`innoextract`](https://constexpr.org/innoextract/) | Windows `.exe` installers (best)   | **macOS:** `brew install innoextract` • **Linux:** `sudo apt install innoextract` • **Windows:** `choco install innoextract`                              |
 | [`7-Zip`](https://www.7-zip.org/) (`7z`)            | Fallback for multi-part installers | **macOS:** `brew install p7zip` • **Linux:** `sudo apt install p7zip-full` • **Windows:** [Download from 7-zip.org](https://www.7-zip.org/) (add to PATH) |
 | [`unzip`](https://linux.die.net/man/1/unzip)        | Linux `.sh` installers             | Usually pre-installed on most systems                                                                                                                     |
+| [`xdelta3`](https://github.com/jmacd/xdelta)        | Hollow Knight's patch              | **macOS:** `brew install xdelta` • **Linux:** `sudo apt install xdelta3` • **Windows:** `choco install xdelta3`                                           |
 
-When an installer needs a tool you do not have, the script offers to install it with `brew`, `apt` or `choco`. Silent Hill 4 needs `innoextract` itself; 7-Zip is enough for the other games. `make tools` shows what is installed, and `make deps` installs the mise tools and innoextract in one go.
+When an installer needs a tool you do not have, the script offers to install it with `brew`, `apt` or `choco`. Silent Hill 4 needs `innoextract` itself; Hollow Knight needs `xdelta3` and 7-Zip; 7-Zip is enough for the other games. `make tools` shows what is installed, and `make deps` installs the mise tools, innoextract and xdelta3 in one go.
 
 ## Usage
 

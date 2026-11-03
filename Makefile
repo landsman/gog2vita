@@ -24,12 +24,12 @@ node_modules: package.json bun.lock
 
 .PHONY: tools
 tools: ## list which extraction tools are on PATH
-	@for t in mise bun shellcheck innoextract 7z 7zz 7za unzip; do printf '%-12s %s\n' $$t "$$(command -v $$t || echo missing)"; done
+	@for t in mise bun shellcheck innoextract xdelta3 7z 7zz 7za unzip; do printf '%-12s %s\n' $$t "$$(command -v $$t || echo missing)"; done
 
 .PHONY: deps
-deps: ## install the mise tools, and innoextract with brew or apt
+deps: ## install the mise tools, and innoextract and xdelta3 with brew or apt
 	mise install
-	@if command -v brew >/dev/null; then brew install innoextract; else sudo apt install -y innoextract; fi
+	@if command -v brew >/dev/null; then brew install innoextract xdelta; else sudo apt install -y innoextract xdelta3; fi
 
 ##@ Quality assurance
 .PHONY: lint
