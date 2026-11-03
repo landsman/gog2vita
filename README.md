@@ -7,11 +7,12 @@ A cross-platform one-command script that takes the offline installer of a game y
 
 ## Supported games
 
-| Game                                                                                                  | Vita port                                                 | Data on the Vita                   | Guide                                          |
-| ----------------------------------------------------------------------------------------------------- | --------------------------------------------------------- | ---------------------------------- | ---------------------------------------------- |
-| [Medal of Honor: Allied Assault](https://www.gog.com/en/game/medal_of_honor_allied_assault_war_chest) | [OpenMoHAA](https://github.com/HenryKun55/openmohaa)      | `ux0:data/openmohaa/main/`         | [docs/mohaa.md](docs/mohaa.md)                 |
-| [Diablo + Hellfire](https://www.gog.com/en/game/diablo)                                               | [DevilutionX](https://github.com/diasurgical/devilutionX) | `ux0:data/diasurgical/devilution/` | [docs/diablo.md](docs/diablo.md)               |
-| [Silent Hill 4: The Room](https://www.gog.com/en/game/silent_hill_4_the_room)                         | [sh4vita](https://github.com/vallfrr/sh4vita)             | `ux0:data/sh4/`                    | [docs/silent-hill-4.md](docs/silent-hill-4.md) |
+| Game                                                                                                  | Vita port                                                                | Data on the Vita                   | Guide                                          |
+| ----------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ | ---------------------------------- | ---------------------------------------------- |
+| [Medal of Honor: Allied Assault](https://www.gog.com/en/game/medal_of_honor_allied_assault_war_chest) | [OpenMoHAA](https://github.com/HenryKun55/openmohaa)                     | `ux0:data/openmohaa/main/`         | [docs/mohaa.md](docs/mohaa.md)                 |
+| [Diablo + Hellfire](https://www.gog.com/en/game/diablo)                                               | [DevilutionX](https://github.com/diasurgical/devilutionX)                | `ux0:data/diasurgical/devilution/` | [docs/diablo.md](docs/diablo.md)               |
+| [Silent Hill 4: The Room](https://www.gog.com/en/game/silent_hill_4_the_room)                         | [sh4vita](https://github.com/vallfrr/sh4vita)                            | `ux0:data/sh4/`                    | [docs/silent-hill-4.md](docs/silent-hill-4.md) |
+| [Hollow Knight](https://store.steampowered.com/app/367520/Hollow_Knight/) (Steam)                     | [Hollow-Knight-PsVita](https://github.com/PatnosDD/Hollow-Knight-PsVita) | `ux0:app/HKVT12222/`               | [docs/hollow-knight.md](docs/hollow-knight.md) |
 
 Each game is one module in [`src/game/`](src/game/); adding a game means adding a module there that exports a [`Game`](src/game/game.ts) and listing it in `src/game/index.ts`.
 
@@ -32,8 +33,9 @@ You also need at least one of the following extraction tools installed and avail
 | [`innoextract`](https://constexpr.org/innoextract/) | Windows `.exe` installers (best)   | **macOS:** `brew install innoextract` • **Linux:** `sudo apt install innoextract` • **Windows:** `choco install innoextract`                              |
 | [`7-Zip`](https://www.7-zip.org/) (`7z`)            | Fallback for multi-part installers | **macOS:** `brew install p7zip` • **Linux:** `sudo apt install p7zip-full` • **Windows:** [Download from 7-zip.org](https://www.7-zip.org/) (add to PATH) |
 | [`unzip`](https://linux.die.net/man/1/unzip)        | Linux `.sh` installers             | Usually pre-installed on most systems                                                                                                                     |
+| [`xdelta3`](https://github.com/jmacd/xdelta)        | Hollow Knight's patch              | **macOS:** `brew install xdelta` • **Linux:** `sudo apt install xdelta3` • **Windows:** `choco install xdelta3`                                           |
 
-When an installer needs a tool you do not have, the script offers to install it with `brew`, `apt` or `choco`. Silent Hill 4 needs `innoextract` itself; 7-Zip is enough for the other games. `make tools` shows what is installed, and `make deps` installs the mise tools and innoextract in one go.
+When an installer needs a tool you do not have, the script offers to install it with `brew`, `apt` or `choco`. Silent Hill 4 needs `innoextract` itself; Hollow Knight needs `xdelta3` and 7-Zip; 7-Zip is enough for the other games. `make tools` shows what is installed, and `make deps` installs the mise tools, innoextract and xdelta3 in one go.
 
 ## Usage
 
@@ -61,7 +63,7 @@ bun src\extract_for_vita.ts
 bun src\extract_for_vita.ts "games-gog\setup_diablo_1.09_hellfire_v4_(78466).exe"
 ```
 
-The game is recognised by the installer's file name; if the name is not one the script knows, it asks which game it is. The output lands in `games-vita/` in this repository, one folder per port — `openmohaa/main/`, `diasurgical/devilution/` or `sh4vita/sh4/` — laid out the way `ux0:data/` expects it, and the game's guide says where it goes on the Vita.
+The game is recognised by the installer's file name; if the name is not one the script knows, it asks which game it is. The output lands in `games-vita/` in this repository, one folder per port — `openmohaa/main/`, `diasurgical/devilution/`, `sh4vita/sh4/` or `hollowknight/HKVT12222/` — laid out the way the Vita expects it, and the game's guide says where it goes on the Vita.
 
 ## Troubleshooting
 

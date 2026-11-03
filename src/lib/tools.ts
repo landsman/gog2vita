@@ -20,6 +20,12 @@ export const SEVEN_ZIP: Tool = {
   packages: { brew: "p7zip", apt: "p7zip-full", choco: "7zip" },
 };
 
+export const XDELTA: Tool = {
+  name: "xdelta3",
+  commands: ["xdelta3"],
+  packages: { brew: "xdelta", apt: "xdelta3", choco: "xdelta3" },
+};
+
 /**
  * Each inner list needs one of its tools, the first being the one to install.
  * Offers to install what is missing, and stops the run when it stays missing.

@@ -28,6 +28,7 @@ export async function pickInstaller(gogDir: string): Promise<Picked> {
 /** Nothing for this game yet: point at its GOG page and wait for the installer to be dragged in. */
 async function askForInstaller(game: Game, gogDir: string): Promise<Picked> {
   console.log(`Nothing for it in ${gogDir}.\n`);
+  if (game.steam !== undefined) return askForSteamCopy(game, game.steam, gogDir);
   if ((await ask("Do you already own it on GOG? [y/N]:")).toLowerCase().startsWith("y")) {
     console.log(`Download the offline installer (signed in):  ${accent(link(game.download))}`);
   } else {
@@ -37,6 +38,15 @@ async function askForInstaller(game: Game, gogDir: string): Promise<Picked> {
   console.log(`Put the .exe and its .bin files in ${gogDir}, or drag the .exe here.\n`);
   const answer = await ask("Path to the setup_*.exe (Enter to look in games-gog/ again):");
   if (answer !== "") return { installer: fromDraggedPath(answer), game };
+  return { installer: installersFor(game, gogDir)[0], game };
+}
+
+/** A port patching the Steam copy: the game folder goes into the port's patch folder, not an installer. */
+async function askForSteamCopy(game: Game, steam: string, gogDir: string): Promise<Picked> {
+  console.log(`Buy it on Steam:  ${accent(link(steam))}`);
+  console.log(`Download the port's Steam patch:  ${accent(link(game.download))}`);
+  console.log(`Unzip it into ${gogDir} and copy the game's Windows folder into it, see docs/ for this game.\n`);
+  await ask("Enter when it is there:");
   return { installer: installersFor(game, gogDir)[0], game };
 }
 

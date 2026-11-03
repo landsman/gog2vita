@@ -67,7 +67,7 @@ async function extractSh(installer: string, tmp: string): Promise<boolean> {
   return false;
 }
 
-function findSevenZip(): string | null {
+export function findSevenZip(): string | null {
   return SEVEN_ZIP.commands.map((command) => Bun.which(command)).find((path) => path !== null) ?? null;
 }
 

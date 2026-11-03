@@ -8,6 +8,7 @@ import { pickInstaller } from "#lib/pick_installer";
 const MOHAA = "1";
 const DIABLO = "2";
 const SH4 = "3";
+const HOLLOW_KNIGHT = "4";
 let gog: string;
 let printed: () => string;
 
@@ -74,4 +75,11 @@ test("takes a dragged-in path, quoted or with backslash escapes", async () => {
 
 test("Enter looks in the folder again, for an installer put there meanwhile", async () => {
   expect(await pick(DIABLO, "", "")).toEqual([undefined, "DevilutionX"]);
+});
+
+test("a Steam port links Steam and the port's patch, not a GOG installer", async () => {
+  expect(await pick(HOLLOW_KNIGHT, "")).toEqual([undefined, "Hollow Knight Vita"]);
+
+  expect(printed()).toContain("Buy it on Steam:  https://store.steampowered.com/app/367520/Hollow_Knight/");
+  expect(printed()).not.toContain("GOG");
 });
