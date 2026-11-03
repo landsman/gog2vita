@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, mock, spyOn, test } from "bun:
 import { existsSync, mkdtempSync, readdirSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
+import { gameFiles } from "#game/hollow_knight";
 import { detectGame, GAMES } from "#game/index";
 import { touch } from "#lib/test_answers";
 
@@ -148,12 +149,69 @@ describe("Silent Hill 4", () => {
   });
 });
 
+describe("Hollow Knight", () => {
+  const collect = (s: string, o: string) => game("Hollow Knight Vita").collect(s, o);
+
+  function mockTools() {
+    spyOn(Bun, "which").mockImplementation(((name: string) => `/bin/${name}`) as typeof Bun.which);
+    return spyOn(Bun, "spawn").mockImplementation((() => ({
+      exited: Promise.resolve(0),
+    })) as unknown as typeof Bun.spawn);
+  }
+
+  test("a patch folder without the game leaves the output alone", async () => {
+    touch(join(src, "vcdiff/STEAMFILES_HollowKnight.zip.vcdiff"));
+    touch(join(out, "eboot.bin"));
+
+    expect(await collect(src, out)).toEqual({
+      copied: [],
+      missing: ["Hollow Knight/hollow_knight_Data/", "Hollow Knight_Data/"],
+    });
+    expect(existsSync(join(out, "eboot.bin"))).toBe(true);
+  });
+
+  test("a GOG copy stops on the missing patch", async () => {
+    touch(join(src, "Hollow Knight_Data/app.info"));
+    touch(join(src, "vcdiff/GOGFILES_HollowKnight.zip.vcdiff"));
+
+    await expect(collect(src, out)).rejects.toThrow("no GOG patch");
+  });
+
+  test("another game version stops before patching", async () => {
+    touch(join(src, "Hollow Knight/hollow_knight_Data/app.info"), "not 5 GB");
+    touch(join(src, "vcdiff/STEAMFILES_HollowKnight.zip.vcdiff"));
+    const spawn = mockTools();
+
+    await expect(collect(src, out)).rejects.toThrow("expected 5181410649 bytes");
+    expect(spawn).not.toHaveBeenCalled();
+  });
+
+  test("names the files as the Windows patcher does, without what the game or macOS wrote", () => {
+    for (const path of [
+      "app.info",
+      "Managed/Assembly-CSharp.dll",
+      "Config.ini",
+      "Managed/Config.ini",
+      ".DS_Store",
+      "Managed/._x.dll",
+    ])
+      touch(join(src, "Hollow Knight/hollow_knight_Data", path));
+
+    expect(gameFiles(src, "Hollow Knight/hollow_knight_Data").map((f) => f.name)).toEqual([
+      "Hollow Knight\\hollow_knight_Data\\Managed\\Assembly-CSharp.dll",
+      "Hollow Knight\\hollow_knight_Data\\Managed\\Config.ini",
+      "Hollow Knight\\hollow_knight_Data\\app.info",
+    ]);
+  });
+});
+
 describe("detectGame", () => {
   test("picks the game by installer name or folder", () => {
     expect(detectGame("setup_diablo_1.09_hellfire_v4_(78466).exe")?.port).toBe("DevilutionX");
     expect(detectGame("setup_medal_of_honor_2.0.0.21.exe")?.port).toBe("OpenMoHAA");
     expect(detectGame("setup_silent_hill_4_the_room_1.0_gog_v5_(80750).exe")?.port).toBe("sh4vita");
     expect(detectGame("SH4")?.port).toBe("sh4vita");
+    expect(detectGame("HollowKnightVitaPatchSteam")?.port).toBe("Hollow Knight Vita");
     expect(detectGame("setup_quake.exe")).toBeUndefined();
   });
 });

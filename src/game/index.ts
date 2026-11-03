@@ -2,10 +2,11 @@ import { choose } from "#lib/ask";
 import { quiet } from "#lib/style";
 import type { Game } from "#game/game";
 import { diablo } from "#game/diablo";
+import { hollowKnight } from "#game/hollow_knight";
 import { mohaa } from "#game/mohaa";
 import { silentHill4 } from "#game/silent_hill_4";
 
-export const GAMES: Game[] = [mohaa, diablo, silentHill4];
+export const GAMES: Game[] = [mohaa, diablo, silentHill4, hollowKnight];
 
 /** The game whose installer name prefix or game folder name matches. */
 export function detectGame(installerName: string): Game | undefined {
